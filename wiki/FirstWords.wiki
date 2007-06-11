@@ -1,0 +1,15 @@
+#summary First words about the project
+#labels Featured,Phase-Requirements,Phase-Design
+
+= Introduction =
+
+This is a database schema evolution tool/library, by control version, ORM and DBMS independent, multi-platform, created with Python. This is an Active Record Migrations like project.
+
+= Details =
+
+  * [CoreAPI]
+  * [References]
+  * [Examples]
+  * [Dependences]
+  * [Tasks]
+  * ProjectMembers

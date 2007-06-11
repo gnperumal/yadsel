@@ -1,0 +1,17 @@
+#summary This task is about database schema introspection resource.
+#labels Phase-Implementation,Phase-Design
+
+= Introduction =
+
+This resource haves the goal for supply a efficient way to get the database schema and generate a full script version, with CreateTable, CreateDomain and CreateIndex statements.
+
+It was started, first for SQLite Driver, but MySQL is near :)
+
+= Details =
+
+For see this resource, loot following classes:
+
+  * dbmigrations.core.versions.FullVersionBuilder
+  * dbmigrations.core.dbms.SchemaInspector
+  * dbmigrations.core.dbms.Driver.Inspector
+  * dbmigrations.drivers.sqlite.SQLiteInspector

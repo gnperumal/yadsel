@@ -1,0 +1,18 @@
+#summary A websites list with references used or considered for this project.
+#labels Featured,Phase-Requirements
+
+= Introduction =
+
+Sadly, the SQL standards definition is not freely available, depending to pay [http://www.iso.org ISO] or [http://www.ansi.org ANSI] for it. But exists some websites with great part of definition for reference.
+
+The list is behind.
+
+= SQL References =
+
+  * [http://databases.about.com/od/sql/a/sqlbasics.htm SQL Basics]
+  * [http://en.wikipedia.org/wiki/Sql SQL on Wikipedia]
+  * [http://savage.net.au/SQL/sql-2003-1.bnf.html SQL/Foundation (SQL-2003)]
+  * [http://savage.net.au/SQL/sql-2003-2.bnf.html SQL/Statements (SQL-2003)]
+  * [http://www.wiscorp.com/sql_2003_standard.zip Unnoficial SQL Standard Definitions (zipped PDF files)]
+
+= ORM References =

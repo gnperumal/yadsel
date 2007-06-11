@@ -1,0 +1,24 @@
+#summary This page has some words about the SQLite driver.
+#labels Phase-Deploy,Phase-Implementation
+
+= Introduction =
+
+This is the driver for SQLite support.
+
+= Details =
+
+Module path: *dbmigrations.drivers.sqlite*
+Main class: *dbmigrations.drivers.SQLite*
+
+Class tree:
+
+  * SQLiteDriver(dbmigrations.drivers.GenericDriver)
+
+= Dependences =
+
+This module depends of *pySQLite* library, the most popular driver for SQLite on Python language. You can see more about *(and download it)* on its official website: [1]
+
+The introspection does through the PRAGMA statements suplied by SQLite protocol (described in [2]).
+
+[1] [http://www.initd.org/tracker/pysqlite/wiki/pysqlite]
+[2] [http://www.sqlite.org/pragma.html#schema]

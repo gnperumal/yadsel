@@ -1,0 +1,21 @@
+#summary This page has some words about the MySQL driver.
+#labels Phase-Deploy,Phase-Implementation
+
+= Introduction =
+
+This is our first driver, where we are testing the concept behind the scenes in a real case.
+
+= Details =
+
+Module path: *dbmigrations.drivers.mysql*
+Main class: *dbmigrations.drivers.MySQL*
+
+Class tree:
+
+  * MySQLDriver(dbmigrations.drivers.GenericDriver)
+
+= Dependences =
+
+This module depends of *MySQLdb* library, the most popular driver for MySQL on Python language. You can see more about *(and download it)* on its official website: [1]
+
+[1] http://mysql-python.sourceforge.net/

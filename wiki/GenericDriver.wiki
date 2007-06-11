@@ -1,0 +1,42 @@
+#summary This page has some words about the GenericDriver.
+#labels Phase-Design
+
+= Introduction =
+
+This is the base class driver, that is where we implement all standards SQL, based on ANSI SQL and/or SQL-99, until is possible
+
+= Details =
+
+Module path: *dbmigrations.drivers.generic*
+Main class: *dbmigrations.drivers.Generic*
+
+Class tree:
+
+  * FieldParser(object)
+   * for_create()
+   * for_alter()
+   * for_rename()
+  * ActionParser(object)
+   * for_alter()
+  * ValueParser(object)
+   * for_insert()
+  * ClauseParser(object)
+   * parse_clause()
+   * parse_expression()
+   * for_parser()
+   * for_select()
+   * for_update()
+   * for_delete()
+  * GenericDriver(dbmigrations.core.Driver)
+   * generate_script()
+   * generate_script_for_createtable()
+   * generate_script_for_altertable()
+   * generate_script_for_droptable()
+   * generate_script_for_createindex()
+   * generate_script_for_dropindex()
+   * generate_script_for_insert()
+   * generate_script_for_select()
+
+= Dependences =
+
+Has no dependences,

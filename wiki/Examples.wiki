@@ -1,0 +1,130 @@
+#summary This page shows some examples of version control classes for migrations.
+#labels Featured,Phase-Support
+
+= Example 1 =
+
+{{{
+from core import *
+
+class Version1(Version):
+    version_number = 1
+
+    def up(self):
+        CreateTable('central_relacionamento',
+                id = Integer(autoincrement=True, primary_key=True),
+                dono_id = Integer(references=ForeignKey('auth_user', 'id')),
+                amigo_id = Integer(references=ForeignKey('auth_user', 'id')),
+                tipo = Char(1, default='P'),
+            ).append_to(self)
+
+        AlterTable('central_userinfo',
+                RenameColumn('dono_id', 'user_id', Integer()),
+                Add('moderador_id', Integer(required=False, references=ForeignKey('auth_user', 'id'))),
+                Add('tipo', Char(1, default='P')),
+            ).append_to(self)
+
+        Update('central_userinfo',
+                Set(tipo='C'),
+                Where(e_comunidade=1),
+            ).append_to(self)
+
+        AlterTable('central_userinfo',
+                DropColumn('e_comunidade'),
+            ).append_to(self)
+
+        AlterTable('central_publicacao',
+                Add('tipo', Char(1, default='D')),
+            ).append_to(self)
+
+        Update('central_publicacao',
+                Set(tipo='F'),
+                Where(imagem__isnull=False),
+            ).append_to(self)
+
+        Insert('central_relacionamento',
+                Select('central_userinfo_amigos a JOIN central_userinfo ui ON a.userinfo_id = ui.id',
+                    dict(
+                        dono_id = 'ui.user_id',
+                        amigo_id = 'a.user_id',
+                        tipo = 'A'
+                        ),
+                    ),
+            ).append_to(self)
+
+        CreateIndex(
+                'idx_central_publicacao_tipo',
+                'central_publicacao',
+                ('tipo',)
+            ).append_to(self)
+
+    def down(self):
+        DropIndex(
+                'idx_central_publicacao_tipo',
+                'central_publicacao'
+            ).append_to(self)
+
+        DropTable('central_relacionamento').append_to(self)
+}}}
+
+= Example 2 =
+
+{{{
+from core import *
+
+class Version1(Version):
+    version_number = 1
+
+    def up(self):
+        CreateTable('states',
+                id = Integer(required=True),
+                short_name = Char(2, required=True),
+                name = Varchar(50, required=True),
+            ).append_to(self)
+
+        CreateTable('cities',
+                id = Integer(required=True),
+                name = Varchar(50, required=True),
+                state_id = Integer(required=True),
+            ).append_to(self)
+
+    def down(self):
+        DropTable('cities').append_to(self)
+        DropTable('states').append_to(self)
+
+class Version2(Version):
+    version_number = 2
+
+    def up(self):
+        AlterTable('states',
+                Add('percent_tax', Decimal(5,2)),
+                Add('age', Integer()),
+            ).append_to(self)
+
+        CreateTable('streets',
+                id = Integer(required=True),
+                name = Varchar(length=50, required=True),
+                city_id = Integer(required=True),
+            ).append_to(self)
+
+    def down(self):
+        DropTable('streets').append_to(self)
+
+        AlterTable('states',
+                DropColumn('percent_tax'),
+            ).append_to(self)
+
+class Version3(Version):
+    version_number = 3
+
+    def up(self):
+        Insert('streets',
+                id = 1,
+                name = '1st Street',
+                city_id = 27,
+            ).append_to(self)
+
+    def down(self):
+        Delete('streets',
+                Where(id=1),
+            ).append_to(self)
+}}}
