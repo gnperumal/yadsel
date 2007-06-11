@@ -11,7 +11,11 @@ from generic import GenericDriver
 
 class FirebirdInspector(SchemaInspector):
     def get_tables_list(self):
-        result = self.connection.cursor().execute('SELECT rdb$relation_name as table_name FROM rdb$relations WHERE rdb$system_flag = 0')
+        result = self.connection.cursor().execute("\
+                SELECT rdb$relation_name as table_name \
+                FROM rdb$relations \
+                WHERE rdb$system_flag = 0 \
+                ")
         return [l['table_name'] for l in result.fetchallmap()]
 
     def get_fields_list(self, table_name):
