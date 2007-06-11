@@ -11,57 +11,63 @@ from generic import GenericDriver
 
 class FirebirdInspector(SchemaInspector):
     def get_tables_list(self):
-        result = self.connection.cursor().execute('SELECT RDB$RELATION_NAME FROM RDB$RELATIONS WHERE RDB$SYSTEM_FLAG = 0')
-        return [l['RDB$RELATION_NAME'] for l in result.fetchallmap()]
+        result = self.connection.cursor().execute('SELECT rdb$relation_name as table_name FROM rdb$relations WHERE rdb$system_flag = 0')
+        return [l['table_name'] for l in result.fetchallmap()]
 
     def get_fields_list(self, table_name):
         ret = []
 
-        result = self.connection.cursor().execute('\
-                SELECT RF.* \
-                FROM RDB$RELATION_FIELDS RF \
-                WHERE RF.RDB$RELATION_NAME = \'%s\'\
-                ')
+        result = self.connection.cursor().execute("\
+                SELECT \
+                 RF.rdb$field_name as field_name, \
+                 RF.rdb$default_source as default_source, \
+                 F.rdb$field_length as length, \
+                 F.rdb$field_scale * -1 as scale, \
+                 F.rdb$field_type as type_code, \
+                 T.rdb$type_name as type_name, \
+                 T.rdb$null_flag as required \
+                FROM rdb$relation_fields RF \
+                JOIN rdb$fields F ON RF.rdb$field_source = F.rdb$field_name \
+                JOIN rdb$types T ON F.rdb$field_type = T.rdb$type \
+                                AND T.rdb$field_name = 'RDB$FIELD_TYPE' \
+                WHERE RF.rdb$relation_name = '%s' \
+                ORDER BY RF.rdb$field_id \
+                ")
 
-        for r in result.fetchall():
-            match = re.match(r'(\w+)(\(.*?\))?', r[2])
-
-            ft = match.group(1).upper()
-            args = str(match.group(2))
-
-            if args != "":
-                args = re.findall('(\d+)', args)
-
-            if ft == 'VARCHAR':
-                col = Varchar(int(args[0]))
-            elif ft == 'CHAR':
-                col = Char(int(args[0]))
-            elif ft == 'INTEGER':
-                col = Integer()
-            elif ft == 'SMALLINT':
-                col = SmallInt()
-            elif ft in ['DECIMAL', 'NUMERIC']:
-                col = Decimal(int(args[0]), int(args[1]))
+        for r in result.fetchallmap():
+            """
+            missing: QUAD, CSTRING, BLOB_ID
+            """
+            if r['type_name'] == 'VARYING':
+                col = Varchar(r['length'])
             elif ft == 'TEXT':
-                col = Text()
+                col = Char(r['length'])
+            elif ft == 'LONG':
+                col = Integer()
             elif ft == 'DATE':
                 col = Date()
+            elif ft in ['INT64']:
+                col = Decimal(r['length'], r['scale'])
+            elif ft == 'SHORT':
+                col = SmallInt()
             elif ft == 'TIME':
-                col = Time()
-            elif ft == 'DATETIME':
-                col = DateTime()
+                col = TimeInt()
             elif ft == 'TIMESTAMP':
-                col = Timestamp()
-            elif ft == 'BOOL':
-                col = Boolean()
+                col = TimestampInt()
+            elif ft == 'FLOAT':
+                col = FloatInt()
+            elif ft == 'DOUBLE': # to be verified
+                col = FloatInt()
+            elif ft == 'BLOB':
+                col = TextInt()
             else:
                 print "Field type not identified: %s %s" %( r[1], r[2] )
                 continue
 
-            col.name = r[1]
-            col.required = r[3] != 0
-            col.default = r[4]
-            col.primary_key = r[5] == 1
+            col.name = r['field_name']
+            col.required = r['required'] == 1
+            #col.default = r[4]
+            #col.primary_key = r[5] == 1
             
             ret.append(col)
 
@@ -70,17 +76,18 @@ class FirebirdInspector(SchemaInspector):
     def get_constraints_list(self, table_name):
         ret = []
 
-        result = self.connection.cursor().execute('PRAGMA foreign_key_list(%s)' % table_name)
+        #result = self.connection.cursor().execute('PRAGMA foreign_key_list(%s)' % table_name)
 
-        for r in result.fetchall():
-            ret.append( ForeignKey(r[1], r[3], r[2]) )
+        #for r in result.fetchall():
+        #    ret.append( ForeignKey(r[1], r[3], r[2]) )
 
         return ret
 
     def get_indexes_list(self, table_name):
-        result = self.connection.cursor().execute('PRAGMA index_list(%s)' % table_name)
+        return []
+        #result = self.connection.cursor().execute('PRAGMA index_list(%s)' % table_name)
 
-        return [r[1] for r in result.fetchall()]
+        #return [r[1] for r in result.fetchall()]
 
     def get_index_info(self, index_name):
         return None

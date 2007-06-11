@@ -7,4 +7,5 @@
 from generic import GenericDriver as Generic
 from mysql import MySQLDriver as MySQL
 from sqlite import SQLiteDriver as SQLite
+from firebird import FirebirdDriver as Firebird
 

@@ -130,6 +130,9 @@ class Decimal(FieldType):
 class Numeric(Decimal):
     pass
 
+class Float(FieldType):
+    pass
+
 class Domain(FieldType):
     """
     This class will be receive another resource in future, when
