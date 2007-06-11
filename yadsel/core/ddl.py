@@ -45,7 +45,7 @@ class CreateTable(Command):
         """
         sp = ident_space * ident_level
         ret = []
-        ret.append("%s('%s'" %( self.__class__.__name__, self.table_name ))
+        ret.append("%s('%s'," %( self.__class__.__name__, self.table_name ))
         for f in self.fields:
             ret.append("%s%s," %( ident_space, f.to_script() ))
         for c in self.constraints:

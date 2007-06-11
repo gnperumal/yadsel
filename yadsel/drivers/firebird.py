@@ -11,66 +11,82 @@ from generic import GenericDriver
 
 class FirebirdInspector(SchemaInspector):
     def get_tables_list(self):
-        result = self.connection.cursor().execute("\
+        cur = self.connection.cursor()
+        cur.execute("\
                 SELECT rdb$relation_name as table_name \
                 FROM rdb$relations \
                 WHERE rdb$system_flag = 0 \
                 ")
-        return [l['table_name'] for l in result.fetchallmap()]
+
+        result = cur.fetchallmap()
+        
+        return [r['table_name'].strip() for r in result]
 
     def get_fields_list(self, table_name):
         ret = []
 
-        result = self.connection.cursor().execute("\
+        cur = self.connection.cursor()
+        cur.execute("\
                 SELECT \
                  RF.rdb$field_name as field_name, \
                  RF.rdb$default_source as default_source, \
-                 F.rdb$field_length as length, \
-                 F.rdb$field_scale * -1 as scale, \
+                 F.rdb$field_length as field_length, \
+                 F.rdb$field_scale as scale, \
                  F.rdb$field_type as type_code, \
                  T.rdb$type_name as type_name, \
-                 T.rdb$null_flag as required \
+                 RF.rdb$null_flag as required \
                 FROM rdb$relation_fields RF \
                 JOIN rdb$fields F ON RF.rdb$field_source = F.rdb$field_name \
                 JOIN rdb$types T ON F.rdb$field_type = T.rdb$type \
                                 AND T.rdb$field_name = 'RDB$FIELD_TYPE' \
                 WHERE RF.rdb$relation_name = '%s' \
-                ORDER BY RF.rdb$field_id \
-                ")
+                ORDER BY RF.rdb$field_id\
+                " % table_name)
 
-        for r in result.fetchallmap():
+        result = cur.fetchallmap()
+        
+        for r in result:
             """
             missing: QUAD, CSTRING, BLOB_ID
             """
-            if r['type_name'] == 'VARYING':
-                col = Varchar(r['length'])
+            ft = r['type_name'].strip()
+            field_name = r['field_name'].strip()
+
+            if ft == 'VARYING':
+                col = Varchar(r['field_length'])
             elif ft == 'TEXT':
-                col = Char(r['length'])
+                col = Char(r['field_length'])
             elif ft == 'LONG':
                 col = Integer()
             elif ft == 'DATE':
                 col = Date()
             elif ft in ['INT64']:
-                col = Decimal(r['length'], r['scale'])
+                col = Decimal(r['field_length'], r['scale'] * -1)
             elif ft == 'SHORT':
                 col = SmallInt()
             elif ft == 'TIME':
-                col = TimeInt()
+                col = Time()
             elif ft == 'TIMESTAMP':
-                col = TimestampInt()
+                col = Timestamp()
             elif ft == 'FLOAT':
-                col = FloatInt()
+                col = Float()
             elif ft == 'DOUBLE': # to be verified
-                col = FloatInt()
+                col = Float()
             elif ft == 'BLOB':
-                col = TextInt()
+                col = Text()
             else:
                 print "Field type not identified: %s %s" %( r[1], r[2] )
                 continue
 
-            col.name = r['field_name']
+            col.name = field_name
             col.required = r['required'] == 1
-            #col.default = r[4]
+
+            # Takes the default value
+            r = re.compile("^(DEFAULT [']{0,1})([^']*).*")
+            m = r.match(r['default_source'].strip())
+            col.default = m.group(2)
+
+            # We need take primary key information from RDB$INDEX_SEGMENTS and RDB$RELATION_CONSTRAINTS tables select
             #col.primary_key = r[5] == 1
             
             ret.append(col)
