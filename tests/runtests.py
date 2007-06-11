@@ -20,14 +20,14 @@ if os.path.isdir(path):
     sys.path.append(path)
 
     try:
-        dbmigrations = __import__('dbmigrations_src')
+        yadsel = __import__('yadsel_src')
     except:
-        import dbmigrations
+        import yadsel
 else:
-    import dbmigrations
+    import yadsel
 
-from dbmigrations.core import Controller, FullVersionBuilder
-from dbmigrations.drivers import SQLite
+from yadsel.core import Controller, FullVersionBuilder
+from yadsel.drivers import *
 
 if CASE_1:
     print 'Parsing:', versions_path
