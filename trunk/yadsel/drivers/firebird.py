@@ -118,8 +118,71 @@ class FirebirdInspector(SchemaInspector):
     def get_domains_list(self):
         return []
 
+class FirebirdFieldParser(object):
+    field = None
+
+    def __init__(self, obj):
+        self.field = obj
+
+    def for_create(self):
+        fcls = self.field.__class__
+
+        if not issubclass(fcls, FieldType):
+            return ""
+
+        ret = self.field.name
+
+        if fcls == Varchar:
+            ret += " VARCHAR(%d) " % self.field.length
+        elif fcls == Char:
+            ret += " CHAR(%d) " % self.field.length
+        elif fcls == Boolean:
+            ret += " TINYINT "
+        elif fcls == Decimal or fcls == Numeric:
+            ret += " DECIMAL(%d,%d) " % ( self.field.length, self.field.digits )
+        elif fcls == Text:
+            if hasattr(self.field, 'segment_size'):
+                segment_size = self.field.segment_size
+            else:
+                segment_size = 4096
+            
+            ret += " BLOB SUB_TYPE 2 SEGMENT SIZE %d " % segment_size
+        elif fcls == Blob:
+            if hasattr(self.field, 'segment_size'):
+                segment_size = self.field.segment_size
+            else:
+                segment_size = 4096
+            
+            ret += " BLOB SUB_TYPE 1 SEGMENT SIZE %d " % segment_size
+        else:
+            ret += " %s " % fcls.__name__.upper()
+
+        if self.field.required:
+            ret += " NOT NULL "
+
+        if not self.field.default is None:
+            if fcls in [Varchar, Char, Date, Time, DateTime, Timestamp, Text]:
+                ret += " DEFAULT '%s' " % self.field.default
+            else:
+                ret += " DEFAULT %s " % self.field.default
+
+        if self.field.references and self.field.references.__class__ == ForeignKey:
+            ret += " REFERENCES '%s' ('%s') " %( self.field.references.table_name, self.field.references.field_name )
+
+        if self.field.primary_key:
+            ret += " PRIMARY KEY "
+
+        return ret
+
+    def for_alter(self):
+        return self.for_create()
+
+    def for_rename(self):
+        return self.for_create()
+
 class FirebirdDriver(GenericDriver):
     class Inspector(FirebirdInspector): pass
+    class FieldParser(FirebirdFieldParser): pass
 
     def __init__(self, connection=None):
         super(FirebirdDriver, self).__init__(connection)

@@ -99,7 +99,10 @@ class Time(FieldType):
     pass
 
 class Text(FieldType):
-    pass
+    segment_size = None
+
+class Blob(FieldType):
+    segment_size = None
 
 class Boolean(FieldType):
     pass
