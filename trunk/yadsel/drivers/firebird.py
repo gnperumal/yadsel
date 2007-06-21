@@ -82,24 +82,42 @@ class FirebirdInspector(SchemaInspector):
             col.required = r['required'] == 1
 
             # Takes the default value
-            r = re.compile("^(DEFAULT [']{0,1})([^']*).*")
-            m = r.match(r['default_source'].strip())
-            col.default = m.group(2)
-
-            # We need take primary key information from RDB$INDEX_SEGMENTS and RDB$RELATION_CONSTRAINTS tables select
-            #col.primary_key = r[5] == 1
+            if r['default_source']:
+                reg = re.compile("^(DEFAULT [']{0,1})([^']*).*", re.IGNORECASE)
+                m = reg.match(r['default_source'].strip())
+                col.default = `m.group(2)`
             
             ret.append(col)
+
+        # Takes primary key information from RDB$INDEX_SEGMENTS and RDB$RELATION_CONSTRAINTS tables
+        cur.execute("\
+                SELECT I.rdb$field_name as field_name \
+                FROM rdb$index_segments I \
+                JOIN rdb$relation_constraints RC ON I.rdb$index_name = RC.rdb$index_name \
+                WHERE RC.rdb$relation_name = '%s' \
+                  AND RC.rdb$constraint_type = 'PRIMARY KEY' \
+                " % table_name)
+        for f in cur.fetchallmap():
+            parseutils.find_field(ret, f['field_name'].strip()).primary_key = True
 
         return ret
 
     def get_constraints_list(self, table_name):
         ret = []
 
-        #result = self.connection.cursor().execute('PRAGMA foreign_key_list(%s)' % table_name)
-
-        #for r in result.fetchall():
-        #    ret.append( ForeignKey(r[1], r[3], r[2]) )
+        """cur = self.connection.cursor()
+        cur.execute("\
+                SELECT \
+                 I.rdb$field_name as field_name, \
+                 I.rdb$constraint_name as constraint_name \
+                FROM rdb$index_segments I \
+                JOIN rdb$relation_constraints RC ON I.rdb$index_name = RC.rdb$index_name \
+                WHERE RC.rdb$relation_name = '%s' \
+                  AND RC.rdb$constraint_type == 'FOREIGN KEY' \
+                " % table_name)
+        
+        for f in cur.fetchallmap():
+            ret.append( ForeignKey(table_name, r['field_name'], r['constraint_name']) )"""
 
         return ret
 
@@ -142,14 +160,14 @@ class FirebirdFieldParser(object):
             ret += " DECIMAL(%d,%d) " % ( self.field.length, self.field.digits )
         elif fcls == Text:
             if hasattr(self.field, 'segment_size'):
-                segment_size = self.field.segment_size
+                segment_size = self.field.segment_size or 4096
             else:
                 segment_size = 4096
             
             ret += " BLOB SUB_TYPE 2 SEGMENT SIZE %d " % segment_size
         elif fcls == Blob:
             if hasattr(self.field, 'segment_size'):
-                segment_size = self.field.segment_size
+                segment_size = self.field.segment_size or 4096
             else:
                 segment_size = 4096
             
