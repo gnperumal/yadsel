@@ -10,24 +10,15 @@ CASE_1 = False
 CASE_2 = False
 CASE_3 = False
 CASE_4 = True
+CASE_5 = False
 
 import os, sys
 
 path = os.path.abspath('../')
 versions_path = os.path.abspath('../examples/test1/')
 
-if os.path.isdir(path):
-    sys.path.append(path)
-
-    try:
-        yadsel = __import__('yadsel_src')
-    except:
-        import yadsel
-else:
-    import yadsel
-
 from yadsel.core import Controller, FullVersionBuilder
-from yadsel.drivers import *
+from yadsel.drivers import SQLite, Firebird
 
 if CASE_1:
     print 'Parsing:', versions_path
@@ -95,4 +86,32 @@ if CASE_4:
 
     version = FullVersionBuilder(Firebird, connection=con, version_number=1)
     version.export_to_file('version1.py')
+
+if CASE_5:
+    print 'Parsing:', versions_path
+
+    controller = Controller(Firebird)
+    controller.load_versions_from_path(versions_path)
+
+    print "Upgrading..."
+
+    script = controller.script_for_upgrade()
+    versions_list = script.keys()
+    versions_list.sort()
+
+    for v in versions_list:
+        print "/* Version", v, "*/"
+        for cmd in script[v]:
+            print "", cmd
+
+    print "\nDowngrading..."
+
+    script = controller.script_for_downgrade()
+    versions_list = script.keys()
+    versions_list.sort(lambda a,b: cmp(b,a))
+
+    for v in versions_list:
+        print "/* Version", v, "*/"
+        for cmd in script[v]:
+            print "", cmd
 

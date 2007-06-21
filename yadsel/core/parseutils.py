@@ -18,4 +18,6 @@ def translate_operation(oper):
     else:
         return oper
 
+def find_field(fields_list, field_name):
+    return [f for f in fields_list if f.name == field_name][0]
 
