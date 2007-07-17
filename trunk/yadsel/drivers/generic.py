@@ -15,6 +15,7 @@ AUTO_CONNECT_COMMANDS = [
         'Insert',
         'Update',
         'Delete',
+        'ExecuteSQL',
         ]
 
 class GenericFieldParser(object):
@@ -161,10 +162,16 @@ class GenericDriver(Driver):
     def generate_script_for_createtable(self, obj):
         children = ''
 
+        # Fields parsing
         for f in obj.fields:
             inst = self.FieldParser(f)
             children += inst.for_create() + ", "
             self.additional_scripts += [self.__replace_macros(s, obj) for s in inst.additional_scripts]
+
+        # Constraints parsing
+        for c in obj.constraints:
+            inst = self.ConstraintParser(c)
+            self.additional_scripts += [self.__replace_macros(inst.for_create(), obj)]
 
         children = children[:-2]
         return 'CREATE TABLE %s ( %s );' % ( obj.table_name, children )
@@ -212,4 +219,7 @@ class GenericDriver(Driver):
         ret = 'SELECT %s FROM %s %s' %( fields, obj.table_name, where )
 
         return ret
+
+    def generate_script_for_executesql(self, obj):
+        return obj.sql + obj.terminator
 

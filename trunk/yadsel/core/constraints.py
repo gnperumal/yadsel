@@ -18,10 +18,15 @@ class PrimaryKey(Constraint):
 
 class ForeignKey(Constraint):
     table_name = None
-    field_name = None
+    fields = ()
+    foreign_fields = ()
 
-    def __init__(self, table_name, field_name, name=None):
-        self.table_name, self.field_name, self.name = table_name, field_name, name
+    def __init__(self, fields, table_name, foreign_fields, name=None):
+        from types import TupleType
+        self.table_name, self.name = table_name, name
+
+        self.fields = type(fields) == TupleType and fields or (fields,)
+        self.foreign_fields = type(foreign_fields) == TupleType and foreign_fields or (foreign_fields,)
 
     def to_script(self):
         """
@@ -30,5 +35,9 @@ class ForeignKey(Constraint):
         @author Marinho Brandao
         @creation 2007-06-06
         """
-        return "%s('%s', '%s', name='%s')" %( self.__class__.__name__, self.name, self.table_name, self.field_name )
+        return "%s = %s((%s), '%s', (%s))" %( self.name,
+                                              self.__class__.__name__,
+                                              ''.join(["'%s'," % f for f in self.fields]),
+                                              self.table_name,
+                                              ''.join(["'%s'," % f for f in self.foreign_fields]) )
 

@@ -120,7 +120,7 @@ class FirebirdInspector(SchemaInspector):
                 " % table_name)
         
         for f in cur.fetchallmap():
-            ret.append( ForeignKey(f['foreign_table'].strip(), f['field_name'].strip(), f['constraint_name'].strip()) )
+            ret.append( ForeignKey(f['field_name'].strip(), f['foreign_table'].strip(), 'GUID', f['constraint_name'].strip()) )
 
         return ret
 
@@ -206,9 +206,46 @@ class FirebirdFieldParser(object):
     def for_rename(self):
         return self.for_create()
 
+class FirebirdConstraintParser(object):
+    constraint = None
+
+    def __init__(self, obj):
+        self.constraint = obj
+
+    def get_fields(self):
+        ret = ''.join([",%s" % f for f in self.constraint.fields])
+        return ret[1:]
+
+    def get_foreign_fields(self):
+        ret = ''.join([",%s" % f for f in self.constraint.foreign_fields])
+        return ret[1:]
+
+    def for_create(self):
+        fcls = self.constraint.__class__
+
+        if issubclass(fcls, ForeignKey):
+            ret = 'ALTER TABLE %%TABLE_NAME%% \
+                    ADD CONSTRAINT %s \
+                    FOREIGN KEY (%s) \
+                    REFERENCES %s (%s);' %( self.constraint.name, 
+                                            self.get_fields(),
+                                            self.constraint.table_name, 
+                                            self.get_foreign_fields() )
+        else:
+            ret = ''
+
+        return ret
+
+    def for_alter(self):
+        return self.for_create()
+
+    def for_rename(self):
+        return self.for_create()
+
 class FirebirdDriver(GenericDriver):
     class Inspector(FirebirdInspector): pass
     class FieldParser(FirebirdFieldParser): pass
+    class ConstraintParser(FirebirdConstraintParser): pass
 
     def __init__(self, connection=None):
         super(FirebirdDriver, self).__init__(connection)
@@ -230,4 +267,14 @@ class FirebirdDriver(GenericDriver):
             return result
         else:
             return command
+
+    def generate_script_for_executesql(self, obj):
+        if obj.terminator != ';':
+            ret  = "SET TERM %s ;\n" % obj.terminator
+            ret += "%s%s\n" %( obj.sql, obj.terminator )
+            ret += "SET TERM ; %s\n" % obj.terminator
+        else:
+            ret = obj.sql + obj.terminator
+
+        return ret
 

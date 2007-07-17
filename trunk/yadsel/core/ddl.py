@@ -34,6 +34,7 @@ class CreateTable(Command):
                 kwargs[k].name = k
                 self.fields.append(kwargs[k])
             elif issubclass(kwargs[k].__class__, constraints.Constraint):
+                kwargs[k].name = k
                 self.constraints.append(kwargs[k])
 
     def to_script(self, ident_level=2, ident_space="    "):
