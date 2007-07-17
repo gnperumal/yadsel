@@ -151,11 +151,20 @@ class GenericDriver(Driver):
             else:
                 return ''
 
+    def __replace_macros(self, script, obj):
+        ret = script
+        
+        ret = ret.replace('%TABLE_NAME%', obj.table_name)
+
+        return ret
+
     def generate_script_for_createtable(self, obj):
         children = ''
 
         for f in obj.fields:
-            children += self.FieldParser(f).for_create() + ", "
+            inst = self.FieldParser(f)
+            children += inst.for_create() + ", "
+            self.additional_scripts += [self.__replace_macros(s, obj) for s in inst.additional_scripts]
 
         children = children[:-2]
         return 'CREATE TABLE %s ( %s );' % ( obj.table_name, children )

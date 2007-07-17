@@ -30,5 +30,5 @@ class ForeignKey(Constraint):
         @author Marinho Brandao
         @creation 2007-06-06
         """
-        return "%s(%s, %s, name=%s)" %( self.__class__.__name__, self.name, self.table_name, self.field_name )
+        return "%s('%s', '%s', name='%s')" %( self.__class__.__name__, self.name, self.table_name, self.field_name )
 
