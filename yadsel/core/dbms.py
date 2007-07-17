@@ -25,6 +25,9 @@ class Driver(object):
     class FieldParser:
         pass
 
+    class ConstraintParser:
+        pass
+
     class ActionParser:
         pass
 

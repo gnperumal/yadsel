@@ -116,3 +116,11 @@ class DropAllObjects(Command):
     pass
     # Not yet implemented
 
+class ExecuteSQL(Command):
+    """This class abstract any other SQL command does not supported by the API"""
+    sql = ''
+    terminator = None
+    
+    def __init__(self, sql, terminator=';'):
+        self.sql, self.terminator = sql, terminator
+

@@ -9,8 +9,8 @@
 CASE_1 = False
 CASE_2 = False
 CASE_3 = False
-CASE_4 = True
-CASE_5 = False
+CASE_4 = False
+CASE_5 = True
 
 import os, sys
 
@@ -106,13 +106,13 @@ if CASE_5:
 
     print "Upgrading..."
 
-    controller.upgrade()
-    """script = controller.script_for_upgrade()
+    #controller.upgrade()
+    script = controller.script_for_upgrade()
     versions_list = script.keys()
     versions_list.sort()
 
     for v in versions_list:
         print "/* Version", v, "*/"
         for cmd in script[v]:
-            print "", cmd"""
+            print "", cmd
 
