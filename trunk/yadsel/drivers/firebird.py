@@ -105,19 +105,22 @@ class FirebirdInspector(SchemaInspector):
     def get_constraints_list(self, table_name):
         ret = []
 
-        """cur = self.connection.cursor()
+        cur = self.connection.cursor()
         cur.execute("\
                 SELECT \
                  I.rdb$field_name as field_name, \
-                 I.rdb$constraint_name as constraint_name \
+                 RC.rdb$constraint_name as constraint_name, \
+                 PK.rdb$relation_name as foreign_table \
                 FROM rdb$index_segments I \
                 JOIN rdb$relation_constraints RC ON I.rdb$index_name = RC.rdb$index_name \
+                JOIN rdb$ref_constraints RF ON RC.rdb$constraint_name = RF.rdb$constraint_name \
+                JOIN rdb$relation_constraints PK ON RF.rdb$const_name_uq = PK.rdb$constraint_name \
                 WHERE RC.rdb$relation_name = '%s' \
-                  AND RC.rdb$constraint_type == 'FOREIGN KEY' \
+                  AND RC.rdb$constraint_type = 'FOREIGN KEY' \
                 " % table_name)
         
         for f in cur.fetchallmap():
-            ret.append( ForeignKey(table_name, r['field_name'], r['constraint_name']) )"""
+            ret.append( ForeignKey(f['foreign_table'].strip(), f['field_name'].strip(), f['constraint_name'].strip()) )
 
         return ret
 
@@ -138,9 +141,11 @@ class FirebirdInspector(SchemaInspector):
 
 class FirebirdFieldParser(object):
     field = None
+    additional_scripts = []
 
     def __init__(self, obj):
         self.field = obj
+        self.additional_scripts = []
 
     def for_create(self):
         fcls = self.field.__class__
@@ -175,20 +180,23 @@ class FirebirdFieldParser(object):
         else:
             ret += " %s " % fcls.__name__.upper()
 
-        if self.field.required:
-            ret += " NOT NULL "
-
         if not self.field.default is None:
             if fcls in [Varchar, Char, Date, Time, DateTime, Timestamp, Text]:
                 ret += " DEFAULT '%s' " % self.field.default
             else:
                 ret += " DEFAULT %s " % self.field.default
 
-        if self.field.references and self.field.references.__class__ == ForeignKey:
-            ret += " REFERENCES '%s' ('%s') " %( self.field.references.table_name, self.field.references.field_name )
+        if self.field.required:
+            ret += " NOT NULL "
+
+        #if self.field.references and self.field.references.__class__ == ForeignKey:
+        #    ret += " REFERENCES '%s' ('%s') " %( self.field.references.table_name, self.field.references.field_name )
 
         if self.field.primary_key:
-            ret += " PRIMARY KEY "
+            sql = 'ALTER TABLE %%TABLE_NAME%% \
+                    ADD CONSTRAINT PK_%%TABLE_NAME%% \
+                    PRIMARY KEY (%s);' % self.field.name
+            self.additional_scripts += [sql]
 
         return ret
 

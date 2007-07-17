@@ -15,7 +15,7 @@ CASE_5 = False
 import os, sys
 
 path = os.path.abspath('../')
-versions_path = os.path.abspath('../examples/test1/')
+versions_path = os.path.abspath('../examples/test3/')
 
 from yadsel.core import Controller, FullVersionBuilder
 from yadsel.drivers import SQLite, Firebird
@@ -90,28 +90,29 @@ if CASE_4:
 if CASE_5:
     print 'Parsing:', versions_path
 
-    controller = Controller(Firebird)
+    import kinterbasdb
+    
+    con = kinterbasdb.connect(
+            host='localhost',
+            database='phonus_teste',
+            user='sysdba',
+            password='masterkey',
+            dialect=3,
+            charset='ISO88591',
+            )
+
+    controller = Controller(Firebird, connection=con)
     controller.load_versions_from_path(versions_path)
 
     print "Upgrading..."
 
-    script = controller.script_for_upgrade()
+    controller.upgrade()
+    """script = controller.script_for_upgrade()
     versions_list = script.keys()
     versions_list.sort()
 
     for v in versions_list:
         print "/* Version", v, "*/"
         for cmd in script[v]:
-            print "", cmd
-
-    print "\nDowngrading..."
-
-    script = controller.script_for_downgrade()
-    versions_list = script.keys()
-    versions_list.sort(lambda a,b: cmp(b,a))
-
-    for v in versions_list:
-        print "/* Version", v, "*/"
-        for cmd in script[v]:
-            print "", cmd
+            print "", cmd"""
 

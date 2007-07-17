@@ -10,9 +10,11 @@ and let the implementation for inherit responsability.
 class Driver(object):
     terminate_delimiter = ";"
     connection = None
+    additional_scripts = []
 
     def __init__(self, connection=None):
         self.connection = connection
+        self.additional_scripts = []
 
     def generate_script(self, command):
         pass

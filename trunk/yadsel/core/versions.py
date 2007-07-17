@@ -15,6 +15,7 @@ class Controller(object):
     driver = None
     current_version = 0
     version_classes = []
+    interactive = False
 
     def __init__(self, driver, connection=None, current_version=None):
         self.connection = connection
@@ -92,6 +93,7 @@ class Controller(object):
 
             tmp = ret[str(obj.version_number)] = []
 
+            # Parses commands
             for cmd in obj.commands:
                 s = self.driver.generate_script(cmd)
                 if type(s) == ListType:
@@ -99,13 +101,19 @@ class Controller(object):
                 else:
                     tmp.append(s)
 
+            # Parses additional scripts
+            tmp += self.driver.additional_scripts
+
         return ret
 
     def __execute_command(self, command):
         try:
             self.driver.execute_command(command)
-        except Exception:
-            print "An error ocurred when execute the follow SQL command: '%s'" % command
+        except Exception, (errno, errmsg):
+            print "When executing the following SQL command: '%s', following error ocurred: '%d - %s'" %( command, errno, errmsg )
+
+        if self.interactive:
+            print "Press any key to continue..."
 
     def __execute_script(self, script, versions_sequence):
         # Loop for sequence of versions
@@ -232,11 +240,11 @@ class FullVersionBuilder(object):
         for table_name in lst:
             cmd = CreateTable(table_name)
 
-            # Get the fields list
-            cmd.fields = self.__get_fields(table_name)
-
             # Get the constraints list
             cmd.constraints = self.__get_constraints(table_name)
+
+            # Get the fields list
+            cmd.fields = self.__get_fields(table_name)
 
             self.version.commands.append(cmd)
 
@@ -244,7 +252,7 @@ class FullVersionBuilder(object):
         return self.inspector.get_fields_list(table_name)
 
     def __get_constraints(self, table_name):
-        return [] # ...
+        return self.inspector.get_constraints_list(table_name)
 
     def __get_indexes(self, table_name):
         pass
