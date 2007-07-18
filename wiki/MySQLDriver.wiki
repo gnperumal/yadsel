@@ -7,12 +7,13 @@ This is our first driver, where we are testing the concept behind the scenes in 
 
 = Details =
 
-Module path: *dbmigrations.drivers.mysql*
-Main class: *dbmigrations.drivers.MySQL*
+Module path: *yadsel.drivers.mysql*
+Main class: *yadsel.drivers.MySQL*
 
 Class tree:
 
-  * MySQLDriver(dbmigrations.drivers.GenericDriver)
+  * MySQLDriver(yadsel.drivers.GenericDriver)
+  * MySQLInspector(yadsel.core.dbms.SchemaInspector)
 
 = Dependences =
 
