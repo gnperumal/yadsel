@@ -56,11 +56,16 @@ The Core API is a class system, that support DBMS's drivers, DDL and DML stateme
     * Insert
     * Update
     * Delete 
+    * Merge
+    * ClearAllData
+    * DropAllObjects
+    * ExecuteSQL
   * Clauses
     * Where
     * And
     * Or
-    * Not 
+    * Not
+    * Expression
   * Operations
     * =
     * >
