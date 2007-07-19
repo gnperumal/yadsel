@@ -9,8 +9,8 @@
 CASE_1 = False
 CASE_2 = False
 CASE_3 = False
-CASE_4 = False
-CASE_5 = True
+CASE_4 = True
+CASE_5 = False
 
 import os, sys
 
