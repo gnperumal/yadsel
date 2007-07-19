@@ -73,3 +73,5 @@ The Core API is a class system, that support DBMS's drivers, DDL and DML stateme
     * <
     * <=
     * like
+
+[http://yadsel.googlecode.com/files/core%20package%20diagram.png]
