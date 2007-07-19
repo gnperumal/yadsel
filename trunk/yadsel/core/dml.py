@@ -55,12 +55,17 @@ class Insert(Command):
     select = None
     
     def __init__(self, table_name, *args, **values):
+        from type import TupleType
+
         self.table_name = table_name
         self.values = values or self.values
 
         if len(args) and isinstance(args[0], Select):
             self.select = args[0]
             self.fields = self.select.fields.keys()
+        elif len(args) == 2 and isinstance(args[0], TupleType) and isinstance(args[1], TupleType):
+            self.fields = args[0]
+            self.values = args[1]
         else:
             self.fields = values.keys()
 
