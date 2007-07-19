@@ -21,7 +21,7 @@ This section exists for list project tasks and project members on a responsabili
 ||DjangoDriver||nobody||not started||||
 ||SQLObjectDriver||nobody||not started||||
 ||SQLAlchemyDriver||nobody||not started||||
-||FrontEndGUI||nobody||not started||||
+||[FrontEndGUI]||MarinhoBrandao||started||2007-07-18||
 ||RoutineTranslator||nobody||not started||||
 ||FullVersionBuilder||MarinhoBrandao||started||2007-06-04||
 ||SchemaComparer||nobody||started||2007-06-03||
