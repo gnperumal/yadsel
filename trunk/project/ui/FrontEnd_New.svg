@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45"
+   width="1052.3622"
+   height="744.09448"
+   version="1.0"
+   sodipodi:docbase="D:\lab\yadsel\yadsel\project\ui"
+   sodipodi:docname="FrontEnd_New.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   sodipodi:modified="true">
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs5" />
+  <sodipodi:namedview
+     inkscape:window-height="742"
+     inkscape:window-width="1024"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     guidetolerance="10.0"
+     gridtolerance="10.0"
+     objecttolerance="10.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     width="1052.3622px"
+     height="744.09448px"
+     inkscape:zoom="0.5503993"
+     inkscape:cx="549.81488"
+     inkscape:cy="411.30843"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:current-layer="svg2" />
+  <rect
+     style="fill:#ececec;fill-rule:evenodd;stroke:#000000;stroke-width:0.70115018px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     id="rect2159"
+     width="752.59894"
+     height="447.78412"
+     x="145.65756"
+     y="158.82901"
+     ry="7.0656271" />
+  <rect
+     style="fill:#c87137"
+     id="rect2161"
+     width="738.672"
+     height="29.981829"
+     x="152.62105"
+     y="164.42967" />
+  <rect
+     style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:0.87079835;stroke-opacity:1"
+     id="rect3165"
+     width="738.80121"
+     height="30.111031"
+     x="152.55644"
+     y="567.87689" />
+  <rect
+     style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:0.82850969;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect3167"
+     width="213.79121"
+     height="358.34872"
+     x="154.29591"
+     y="200.82626" />
+  <rect
+     style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:0.68694097;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect7045"
+     width="514.72717"
+     height="357.62079"
+     x="376.3439"
+     y="201.19023" />
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+     d="M 642.01002,137.62019 L 565.01175,164.42967"
+     id="path3150"
+     inkscape:connector-type="polyline"
+     inkscape:connection-end="#rect2161"
+     inkscape:connection-start="#g3156" />
+  <g
+     id="g3156"
+     transform="translate(-564.59117,77.156529)">
+    <g
+       id="g3261">
+      <rect
+         style="fill:#ffff99;fill-opacity:1;stroke:#000000;stroke-width:1.41456068;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="rect2175"
+         width="272.14749"
+         height="51.372238"
+         x="1146.3307"
+         y="8.3841381"
+         ry="12.265294" />
+      <text
+         xml:space="preserve"
+         style="font-size:18.1580143px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="1165.9613"
+         y="40.35828"
+         id="text3152"><tspan
+           sodipodi:role="line"
+           id="tspan3154"
+           x="1165.9613"
+           y="40.35828">Main Window Title Bar</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(-1339.5257,545.68265)"
+     id="g3198">
+    <rect
+       ry="12.265294"
+       y="8.3841381"
+       x="1146.3307"
+       height="51.372238"
+       width="272.14749"
+       id="rect3200"
+       style="fill:#ffff99;fill-opacity:1;stroke:#000000;stroke-width:1.41456068;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       id="text3202"
+       y="40.35828"
+       x="1211.0314"
+       style="font-size:18.1580143px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="40.35828"
+         x="1211.0314"
+         id="tspan3204"
+         sodipodi:role="line">Status Bar</tspan></text>
+  </g>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+     d="M 152.12104,580.90178 L 79.65976,580.50392"
+     id="path3214"
+     inkscape:connector-type="polyline"
+     inkscape:connection-start="#rect3165"
+     inkscape:connection-end="#g3198" />
+  <g
+     id="g3236"
+     transform="translate(-179.86942,-41.787845)">
+    <rect
+       ry="12.265294"
+       y="391.33386"
+       x="1129.9772"
+       height="51.372238"
+       width="272.14749"
+       id="rect3227"
+       style="fill:#ffff99;fill-opacity:1;stroke:#000000;stroke-width:1.41456068;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       id="text3229"
+       y="423.30801"
+       x="1184.3975"
+       style="font-size:18.1580143px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="423.30801"
+         x="1184.3975"
+         id="tspan3231"
+         sodipodi:role="line">Environment Area</tspan></text>
+  </g>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 891.41455,377.28473 L 949.40047,376.67363"
+     id="path3241"
+     inkscape:connector-type="polyline"
+     inkscape:connection-start="#rect7045"
+     inkscape:connection-end="#g3236" />
+  <g
+     id="g3254"
+     transform="translate(111.73673,149.43876)">
+    <rect
+       ry="12.265294"
+       y="180.09825"
+       x="-292.797"
+       height="51.372238"
+       width="272.14749"
+       id="rect3245"
+       style="fill:#ffff99;fill-opacity:1;stroke:#000000;stroke-width:1.41456068;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       id="text3247"
+       y="212.07239"
+       x="-279.76862"
+       style="font-size:18.1580143px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="212.07239"
+         x="-279.76862"
+         id="tspan3249"
+         sodipodi:role="line">Objects Tree/Inspector</tspan></text>
+  </g>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 91.794505,366.29215 L 153.88166,371.31656"
+     id="path3259"
+     inkscape:connector-type="polyline"
+     inkscape:connection-start="#g3254"
+     inkscape:connection-end="#rect3167" />
+  <text
+     xml:space="preserve"
+     style="font-size:18.61285973px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+     x="522.83862"
+     y="186.35951"
+     id="text3277"
+     sodipodi:linespacing="125%"><tspan
+       sodipodi:role="line"
+       id="tspan3279"
+       x="522.83863"
+       y="186.35951">Yadsel - New...</tspan></text>
+</svg>

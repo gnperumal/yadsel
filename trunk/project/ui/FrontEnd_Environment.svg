@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45"
+   width="1052.3622"
+   height="744.09448"
+   version="1.0"
+   sodipodi:docbase="D:\lab\yadsel\yadsel\project\ui"
+   sodipodi:docname="FrontEnd_Environment.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   sodipodi:modified="true">
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs5" />
+  <sodipodi:namedview
+     inkscape:window-height="742"
+     inkscape:window-width="1024"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     guidetolerance="10.0"
+     gridtolerance="10.0"
+     objecttolerance="10.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     width="1052.3622px"
+     height="744.09448px"
+     inkscape:zoom="0.78157634"
+     inkscape:cx="562.80615"
+     inkscape:cy="410.88734"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
+     inkscape:current-layer="svg2" />
+  <rect
+     style="fill:#ececec;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     id="rect2159"
+     width="992.12598"
+     height="690.94489"
+     x="31.344639"
+     y="24.530588"
+     ry="10.902483" />
+  <rect
+     style="fill:#c87137"
+     id="rect2161"
+     width="978.49786"
+     height="29.981829"
+     x="38.158695"
+     y="29.981829" />
+  <rect
+     style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-opacity:1"
+     id="rect2163"
+     width="978.49786"
+     height="29.981829"
+     x="38.158695"
+     y="64.954575" />
+  <text
+     xml:space="preserve"
+     style="font-size:15.52181149px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+     x="47.441147"
+     y="85.169998"
+     id="text3135"><tspan
+       sodipodi:role="line"
+       id="tspan3137"
+       x="47.441147"
+       y="85.169998">File   Edit   View   Tools   Help</tspan></text>
+  <rect
+     style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:1;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+     id="rect3157"
+     width="978.29474"
+     height="43.406822"
+     x="38.260258"
+     y="101.12639" />
+  <rect
+     style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-opacity:1"
+     id="rect3159"
+     width="25.893398"
+     height="25.893398"
+     x="46.335552"
+     y="110.38764" />
+  <rect
+     style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-opacity:1"
+     id="rect3161"
+     width="25.893398"
+     height="25.893398"
+     x="80.998795"
+     y="110.38764" />
+  <rect
+     style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-opacity:1"
+     id="rect3165"
+     width="978.49786"
+     height="29.981829"
+     x="38.158695"
+     y="677.49365" />
+  <rect
+     style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect3167"
+     width="215.43658"
+     height="518.06116"
+     x="38.10244"
+     y="151.85672" />
+  <rect
+     style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect7045"
+     width="754.23999"
+     height="517.19165"
+     x="262.03809"
+     y="152.29147" />
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+     d="M 719.80665,4.9892036 L 599.54324,29.981829"
+     id="path3150"
+     inkscape:connector-type="polyline"
+     inkscape:connection-end="#rect2161"
+     inkscape:connection-start="#g3156" />
+  <g
+     id="g3156"
+     transform="translate(-435.59391,-55.474453)">
+    <g
+       id="g3261">
+      <rect
+         style="fill:#ffff99;fill-opacity:1;stroke:#000000;stroke-width:1.41456068;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="rect2175"
+         width="272.14749"
+         height="51.372238"
+         x="1146.3307"
+         y="8.3841381"
+         ry="12.265294" />
+      <text
+         xml:space="preserve"
+         style="font-size:18.1580143px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="1165.9613"
+         y="40.35828"
+         id="text3152"><tspan
+           sodipodi:role="line"
+           id="tspan3154"
+           x="1165.9613"
+           y="40.35828">Main Window Title Bar</tspan></text>
+    </g>
+  </g>
+  <g
+     id="g3161"
+     transform="translate(-1410.6916,37.741969)">
+    <g
+       id="g3171"
+       transform="translate(-33.266104,-10.235724)">
+      <rect
+         style="fill:#ffff99;fill-opacity:1;stroke:#000000;stroke-width:1.41456068;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="rect3163"
+         width="272.14749"
+         height="51.372238"
+         x="1146.3307"
+         y="8.3841381"
+         ry="12.265294" />
+      <text
+         xml:space="preserve"
+         style="font-size:18.1580143px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="1165.9613"
+         y="40.35828"
+         id="text3165"><tspan
+           sodipodi:role="line"
+           id="tspan3167"
+           x="1165.9613"
+           y="40.35828">Main Menu Bar</tspan></text>
+    </g>
+  </g>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+     d="M -24.772244,65.22334 L 37.658695,66.887866"
+     id="path3169"
+     inkscape:connector-type="polyline"
+     inkscape:connection-end="#rect2163"
+     inkscape:connection-start="#g3161" />
+  <g
+     transform="translate(-1448.8256,113.47595)"
+     id="g3186">
+    <rect
+       ry="12.265294"
+       y="8.3841381"
+       x="1146.3307"
+       height="51.372238"
+       width="272.14749"
+       id="rect3180"
+       style="fill:#ffff99;fill-opacity:1;stroke:#000000;stroke-width:1.41456068;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       id="text3182"
+       y="40.35828"
+       x="1165.9613"
+       style="font-size:18.1580143px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="40.35828"
+         x="1165.9613"
+         id="tspan3184"
+         sodipodi:role="line">Tool Bar</tspan></text>
+  </g>
+  <path
+     inkscape:connection-start="#rect3157"
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+     d="M 37.760258,140.27261 L -29.64014,142.67363"
+     id="path3191"
+     inkscape:connector-type="polyline"
+     inkscape:connection-end="#g3186" />
+  <g
+     transform="translate(-1444.9038,651.0607)"
+     id="g3198">
+    <rect
+       ry="12.265294"
+       y="8.3841381"
+       x="1146.3307"
+       height="51.372238"
+       width="272.14749"
+       id="rect3200"
+       style="fill:#ffff99;fill-opacity:1;stroke:#000000;stroke-width:1.41456068;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       id="text3202"
+       y="40.35828"
+       x="1211.0314"
+       style="font-size:18.1580143px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="40.35828"
+         x="1211.0314"
+         id="tspan3204"
+         sodipodi:role="line">Status Bar</tspan></text>
+  </g>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline"
+     d="M 37.658695,687.26441 L -25.71834,686.58888"
+     id="path3214"
+     inkscape:connector-type="polyline"
+     inkscape:connection-start="#rect3165"
+     inkscape:connection-end="#g3198" />
+  <g
+     id="g3236">
+    <rect
+       ry="12.265294"
+       y="391.33386"
+       x="1129.9772"
+       height="51.372238"
+       width="272.14749"
+       id="rect3227"
+       style="fill:#ffff99;fill-opacity:1;stroke:#000000;stroke-width:1.41456068;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       id="text3229"
+       y="423.30801"
+       x="1184.3975"
+       style="font-size:18.1580143px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="423.30801"
+         x="1184.3975"
+         id="tspan3231"
+         sodipodi:role="line">Environment Area</tspan></text>
+  </g>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 1016.7781,414.58143 L 1129.2699,415.6819"
+     id="path3241"
+     inkscape:connector-type="polyline"
+     inkscape:connection-start="#rect7045"
+     inkscape:connection-end="#g3236" />
+  <g
+     id="g3254"
+     transform="translate(-2.7256208,14.990914)">
+    <rect
+       ry="12.265294"
+       y="180.09825"
+       x="-292.797"
+       height="51.372238"
+       width="272.14749"
+       id="rect3245"
+       style="fill:#ffff99;fill-opacity:1;stroke:#000000;stroke-width:1.41456068;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       id="text3247"
+       y="212.07239"
+       x="-279.76862"
+       style="font-size:18.1580143px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="212.07239"
+         x="-279.76862"
+         id="tspan3249"
+         sodipodi:role="line">Objects Tree/Inspector</tspan></text>
+  </g>
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M -117.06805,247.16868 L 37.60244,343.49245"
+     id="path3259"
+     inkscape:connector-type="polyline"
+     inkscape:connection-start="#g3254"
+     inkscape:connection-end="#rect3167" />
+  <g
+     id="g3272"
+     transform="translate(0,-2)">
+    <rect
+       ry="0"
+       y="161.64616"
+       x="269.79675"
+       height="30.760439"
+       width="141.13612"
+       id="rect3266"
+       style="fill:#ffff99;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       id="text3268"
+       y="182.13167"
+       x="339.10336"
+       style="font-size:16.18707085px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         y="182.13167"
+         x="339.10336"
+         id="tspan3270"
+         sodipodi:role="line">Welcome Tab</tspan></text>
+  </g>
+  <text
+     xml:space="preserve"
+     style="font-size:18.61285973px;font-style:normal;font-weight:bold;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans;font-stretch:normal;font-variant:normal;writing-mode:lr;line-height:125%"
+     x="528.29376"
+     y="51.911667"
+     id="text3277"
+     sodipodi:linespacing="125%"><tspan
+       sodipodi:role="line"
+       id="tspan3279"
+       x="528.29376"
+       y="51.911667">Yadsel Tool</tspan></text>
+</svg>
