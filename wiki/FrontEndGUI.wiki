@@ -1,0 +1,7 @@
+#summary Page about requirements and first words about the Yadsel's Front End GUI tool.
+
+= Introduction =
+
+The goal of this component is create an IDE for create projects, manage versions and introspect some objects and fixtures from a database connection.
+
+= Details =
