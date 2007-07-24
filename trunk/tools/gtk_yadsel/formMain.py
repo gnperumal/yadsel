@@ -90,13 +90,12 @@ class FormMain(forms.Form):
     def on_mniNewVersionFile_activate(self, widget):
         print 'on_mniNewVersionFile_activate'
 
-    def on_mniNewConnection_activate(self, widget):
-        form = self.app.forms.get('formConnection', FormConnection(self.app, self.project.add_connection()))
-
     def on_mniOpenProject_activate(self, widget):
-        self.project.load_from_file(filename)
+        filename = utils.show_open_dialog()
 
-        self.update_widgets()
+        if filename:
+            self.project.load_from_file(filename)
+            self.update_widgets()
 
     def on_mniSave_activate(self, widget):
         filename = utils.show_save_dialog()
@@ -116,4 +115,23 @@ class FormMain(forms.Form):
     def on_btnExit_clicked(self, widget):
         self.on_mniExit_activate(widget)
 
+    def on_mniNewConnection_activate(self, widget):
+        form = self.app.forms.get('formConnection', FormConnection(self.app, self.project.add_connection()))
+
+    def on_mniEditConnection_activate(self, widget):
+        sel = self.treeviewObjects.get_selection()
+        model, iter = sel.get_selected()
+        conn = model.get_value(iter, 1)
+
+        if isinstance(conn, models.Connection):
+            form = self.app.forms.get('formConnection', FormConnection(self.app, conn))
+
+    def on_mniDeleteConnection_activate(self, widget):
+        sel = self.treeviewObjects.get_selection()
+        model, iter = sel.get_selected()
+        conn = model.get_value(iter, 1)
+
+        if isinstance(conn, models.Connection):
+            conn.remove_from_project()
+            self.update_widgets()
 
