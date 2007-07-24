@@ -39,6 +39,7 @@
                             <child>
                               <widget class="GtkMenuItem" id="mniNewVersionFile">
                                 <property name="visible">True</property>
+                                <property name="label" translatable="yes">New Version</property>
                                 <signal name="activate" handler="on_mniNewVersionFile_activate"/>
                               </widget>
                             </child>
@@ -51,6 +52,11 @@
                             </child>
                           </widget>
                         </child>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem3">
+                        <property name="visible">True</property>
                       </widget>
                     </child>
                     <child>
@@ -99,9 +105,46 @@
               </widget>
             </child>
             <child>
+              <widget class="GtkMenuItem" id="menuitem6">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">Versions</property>
+                <child>
+                  <widget class="GtkMenu" id="menu4">
+                    <property name="visible">True</property>
+                    <child>
+                      <widget class="GtkMenuItem" id="mniNewVersionFile1">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">New Version</property>
+                        <signal name="activate" handler="on_mniNewVersionFile_activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem4">
+                        <property name="visible">True</property>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="mniEditVersion">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Edit Version</property>
+                        <signal name="activate" handler="on_mniEditVersion_activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkMenuItem" id="mniDeleteVersion">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Delete Version</property>
+                        <signal name="activate" handler="on_mniDeleteVersion_activate"/>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
+              </widget>
+            </child>
+            <child>
               <widget class="GtkMenuItem" id="menuitem5">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Connection</property>
+                <property name="label" translatable="yes">Connections</property>
                 <child>
                   <widget class="GtkMenu" id="menu3">
                     <property name="visible">True</property>
@@ -110,6 +153,11 @@
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">New Connection</property>
                         <signal name="activate" handler="on_mniNewConnection_activate"/>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkSeparatorMenuItem" id="separatormenuitem2">
+                        <property name="visible">True</property>
                       </widget>
                     </child>
                     <child>
@@ -204,6 +252,13 @@
               </widget>
             </child>
             <child>
+              <widget class="GtkToolButton" id="btnOpenProject">
+                <property name="visible">True</property>
+                <property name="stock_id">gtk-open</property>
+                <signal name="clicked" handler="on_btnOpenProject_clicked"/>
+              </widget>
+            </child>
+            <child>
               <widget class="GtkToolButton" id="btnSave">
                 <property name="visible">True</property>
                 <property name="stock_id">gtk-save</property>
@@ -260,6 +315,21 @@
                   </widget>
                   <packing>
                     <property name="type">tab</property>
+                    <property name="tab_expand">False</property>
+                    <property name="tab_fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <widget class="GtkLabel" id="label2">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">Version example</property>
+                  </widget>
+                  <packing>
+                    <property name="type">tab</property>
+                    <property name="position">1</property>
                     <property name="tab_expand">False</property>
                     <property name="tab_fill">False</property>
                   </packing>
