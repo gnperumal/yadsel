@@ -90,6 +90,12 @@ class FormMain(forms.Form):
     def on_mniNewVersionFile_activate(self, widget):
         print 'on_mniNewVersionFile_activate'
 
+    def on_mniEditVersion_activate(self, widget):
+        print 'on_mniEditVersion_activate'
+
+    def on_mniDeleteVersion_activate(self, widget):
+        print 'on_mniDeleteVersion_activate'
+
     def on_mniOpenProject_activate(self, widget):
         filename = utils.show_open_dialog()
 
@@ -108,6 +114,9 @@ class FormMain(forms.Form):
 
     def on_mniExit_activate(self, widget):
         self.close()
+
+    def on_btnOpenProject_clicked(self, widget):
+        self.on_mniOpenProject_activate(widget)
 
     def on_btnSave_clicked(self, widget):
         self.on_mniSave_activate(widget)
