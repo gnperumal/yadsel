@@ -144,3 +144,6 @@ class FormMain(forms.Form):
             conn.remove_from_project()
             self.update_widgets()
 
+    def on_mniProjectOptions_activate(self, widget):
+        pass
+

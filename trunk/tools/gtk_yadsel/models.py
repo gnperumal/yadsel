@@ -9,10 +9,11 @@ Model classes module container
 import simplejson
 
 class Project(object):
-    connections = []
     initial_version = 0
     latest_version = None
     description = ''
+    connections = []
+    version_files = []
 
     def __init__(self):
         pass
@@ -24,13 +25,6 @@ class Project(object):
         pass
 
     def save_to_file(self, filename):
-        '''
-        ret = {
-            'driver_class': self.driver_class,
-            'dsn': self.dsn,
-            }
-        return ret
-        '''
         instance = {
             'connections': [{'driver_class': c.driver_class, 'dsn': c.dsn} for c in self.connections],
             'initial_version': self.initial_version,
@@ -80,4 +74,7 @@ class Connection(object):
     def remove_from_project(self):
         if self.project and self in self.project.connections:
             self.project.connections.remove(self)
+
+class VersionFile(object):
+    project = None
 
