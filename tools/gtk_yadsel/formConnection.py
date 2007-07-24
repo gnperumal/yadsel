@@ -53,9 +53,11 @@ class FormConnection(forms.Form):
     def on_form_show(self, widget):
         if not self.connection: return
 
+        # Driver combobox value setting
         if self.connection.driver_class:
-            i = utils.DRIVER_CLASSES.values().find(self.connection.driver_class.__name__)
+            i = utils.DRIVER_CLASSES.values().index(self.connection.driver_class) # .__name__
             self.comboDriver.set_active(i)
 
+        # DSN entry value setting
         self.inputDSN.set_text(self.connection.dsn)
 
