@@ -58,8 +58,18 @@ class FormMain(forms.Form):
 
     def __clear_widgets(self):
         # Version pages on notebookMain
+        while self.notebookMain.get_n_pages() > 1:
+            self.notebookMain.remove_page(self.notebookMain.get_n_pages()-1)
+
         # Treeview
+        model = self.treeviewObjects.get_model()
+        if model:
+            model.clear()
+            
         # Other widgets
+        self.labelInitialVersion.set_text('')
+        self.labelLatestVersion.set_text('')
+        self.labelDescription.set_text('')
 
     def __update_widgets(self):
         # TreeView -----------------------------------------------------
@@ -121,7 +131,7 @@ class FormMain(forms.Form):
 
         # Design Treeview
         treeview = gtk.TreeView()
-        treeview.show()
+        #treeview.show() # Not yet ok
         tv_label = gtk.Label('Design')
         notebook.append_page(treeview, tv_label)
 
@@ -229,7 +239,9 @@ class FormMain(forms.Form):
 
     def on_mniNewProject_activate(self, widget):
         self.project = models.Project()
+        self.version_widgets = {}
 
+        self.__clear_widgets()
         self.__update_widgets()
 
     def on_mniNewVersionFile_activate(self, widget):
