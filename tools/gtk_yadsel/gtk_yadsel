@@ -11,7 +11,10 @@ from app import Application
 
 application = None
 
-if __name__ == '__main__':
+def main():
     application = Application()
     application.show_form_main()
+
+if __name__ == '__main__':
+    main()
 

@@ -84,7 +84,7 @@ class Connection(object):
 
 class VersionFile(object):
     project = None
-    content = ''
+    source = ''
     filename = None
     version_number = None
 
@@ -98,20 +98,23 @@ class VersionFile(object):
         self.filename = filename or self.filename
 
         f = file(filename, 'w')
-        f.write(self.content)
+        f.write(self.source)
         f.close()
 
     def load_from_file(self, filename):
         self.filename = filename or self.filename
 
         f = file(filename)
-        self.content = f.read()
+        self.source = f.read()
         f.close()
 
     def __str__(self):
-        return "%s" %( self.version_number or self.project.version_files.index(self) )
+        return "%s" %( self.version_number or self.get_project_index() )
 
     def remove_from_project(self):
         if self.project and self in self.project.version_files:
             self.project.version_files.remove(self)
+
+    def get_project_index(self):
+        return self.project.version_files.index(self)
 

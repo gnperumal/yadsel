@@ -13,6 +13,7 @@ try:
     pygtk.require('2.0')
     import gtk, gtk.glade, gobject
 except:
+    print "GTK 2.0 required! Exiting from application..."
     sys.exit(1)
 
 import utils
