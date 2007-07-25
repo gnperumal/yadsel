@@ -8,8 +8,7 @@ This module is a copy of Django's setup.py and modified for this project.
 
 from distutils.core import setup
 from distutils.command.install import INSTALL_SCHEMES
-import os
-import sys
+import os, sys
 
 # Tell distutils to put the data_files in platform-specific installation
 # locations. See here for an explanation:

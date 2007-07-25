@@ -55,10 +55,9 @@ class Insert(Command):
     select = None
     
     def __init__(self, table_name, *args, **values):
-        from type import TupleType
+        from types import TupleType
 
         self.table_name = table_name
-        self.values = values or self.values
 
         if len(args) and isinstance(args[0], Select):
             self.select = args[0]
@@ -68,6 +67,7 @@ class Insert(Command):
             self.values = args[1]
         else:
             self.fields = values.keys()
+            self.values = values and (values,) or ()
 
 class Update(Command):
     table_name = None

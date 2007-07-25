@@ -10,30 +10,57 @@ import sys
 from yadsel import core, drivers
 
 def print_header():
-    print "DBMigrations // http://code.google.com/p/yadsel/\n"
+    print "Yadsel // http://code.google.com/p/yadsel/\n"
 
 def print_help():
     temp = [
-            "You must declare likes this sintax:",
+            "Invalid syntax. You must declare required parameters, like below:",
             "",
-            "dbmigrationstool <path_with_version_files> [up|down] [new_version_number]"
+            "  path=<version_files_path>\trequired",
+            "  dsn=<dsn>\t\t\trequired",
+            "  user=<username>\t\trequired",
+            "  pass=<password>\t\toptional. Default: empty",
+            "  from=<current_version>\trequired",
+            "  to=<new_version_number>\toptional. Default: latest available version",
+            "  action=[up|down]\t\toptional. Default: up",
            ]
 
     print ''.join([l+"\n" for l in temp])
 
-def do(versions_path, action='up', new_version=None):
-    controller = core.Controller(drivers.SQLite)
+def do(versions_path, driver_type, dsn, user, passwd, action, current_version, new_version):
+    if driver_type == "firebird":
+        try:
+            import kinterbasdb
+        except:
+            print "A Python extension called 'kinterbasdb' was not found!"
+            sys.exit(1)
+
+        print user, passwd
+        connection = kinterbasdb.connect(dsn=dsn, user=user, password=passwd)
+        driver = drivers.Firebird
+    elif driver_type == "mysql":
+        driver = drivers.MySQL
+    elif driver_type == "sqlite":
+        driver = drivers.SQLite
+    else:
+        print "Only drivers 'Firebird', 'MySQL' and 'SQLite' are supported!"
+        sys.exit(1)
+
+    controller = core.Controller(driver, connection=connection)
 
     print "Driver: %s" % controller.driver.__class__.__name__
 
+    controller.current_version = current_version
     controller.load_versions_from_path(versions_path)
 
     if action == 'up':
         print "Upgrading..."
         script = controller.script_for_upgrade(to=new_version)
+        #controller.upgrade()
     elif action == 'down':
         print "Downgrading..."
         script = controller.script_for_downgrade(to=new_version)
+        #controller.downgrade()
 
     for v in script:
         print "/* Version", v, "*/"
@@ -43,20 +70,41 @@ def do(versions_path, action='up', new_version=None):
 if __name__ == '__main__':
     print_header()
 
-    if not len(sys.argv) in [2,3,4]:
+    versions_path = dsn = user = current_version = None
+    action = 'up'
+    new_version = 0
+    passwd = ''
+
+    for arg in sys.argv:
+        if arg.startswith('path='):
+            versions_path = arg.split('=')[1]
+        elif arg.startswith('driver='):
+            driver_type = arg.split('=')[1].lower()
+        elif arg.startswith('dsn='):
+            dsn = arg.split('=')[1]
+        elif arg.startswith('user='):
+            user = arg.split('=')[1] or action
+        elif arg.startswith('pass='):
+            passwd = arg.split('=')[1]
+        elif arg.startswith('action='):
+            action = arg.split('=')[1] or passwd
+        elif arg.startswith('from='):
+            current_version = int(arg.split('=')[1])
+        elif arg.startswith('to='):
+            new_version = int(arg.split('=')[1]) or new_version
+
+    if not(versions_path or dsn or user or current_version):
         print_help()
-    else:
-        args = []
-        for i in range(1,4):
-            if len(sys.argv) > i:
-                args.append(sys.argv[i])
-            else:
-                args.append(None)
+        sys.exit(1)
 
-        versions_path, action, new_version = args
-        action = action or 'up'
-        new_version = new_version or 0
-
-        # Does (up|down)grade
-        do(versions_path, action, int(new_version))
+    # Does the (up|down)grade
+    do(versions_path=versions_path,
+       driver_type=driver_type,
+       dsn=dsn,
+       action=action,
+       user=user,
+       passwd=passwd,
+       current_version=current_version,
+       new_version=new_version
+       )
 
