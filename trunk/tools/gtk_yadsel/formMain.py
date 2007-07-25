@@ -11,12 +11,13 @@ import sys
 try:
     import pygtk
     pygtk.require('2.0')
-    import gtk, gtk.glade, gobject
+    import gtk, gtk.glade, gobject, pango
 except:
     sys.exit(1)
 
 import utils, app, forms, models
 from formConnection import FormConnection
+from formOptions import FormOptions
 
 
 class FormMain(forms.Form):
@@ -25,6 +26,13 @@ class FormMain(forms.Form):
     widget_name = 'formMain'
     project = None
     is_main_form = True
+    widgets = (
+        'notebookMain',
+        'treeviewObjects',
+        'labelInitialVersion',
+        'labelLatestVersion',
+        'labelDescription',
+        )
 
     def __init__(self, app):
         super(FormMain, self).__init__(app)
@@ -60,16 +68,41 @@ class FormMain(forms.Form):
             self.treeviewObjects.append_column(col1)
 
         # Fills model
+        # Connections
         nodeConn = model.append(None)
         model.set_value(nodeConn, 0, 'Connections')
 
         for conn in self.project.connections:
             node = model.append(nodeConn)
-            model.set_value(node, 0, conn.driver_class)
+            model.set_value(node, 0, str(conn))
             model.set_value(node, 1, conn)
 
+        # Versions
         nodeVers = model.append(None)
         model.set_value(nodeVers, 0, 'Versions')
+
+        for vers in self.project.version_files:
+            node = model.append(nodeVers)
+            model.set_value(node, 0, str(vers))
+            model.set_value(node, 1, vers)
+
+        # Project attributes
+        self.labelInitialVersion.set_text(str(self.project.initial_version))
+        self.labelLatestVersion.set_text(str(self.project.latest_version))
+        self.labelDescription.set_text(self.project.description)
+
+    def show_version_editor(self, version_file):
+        editor = gtk.TextView()
+        editor.show()
+        editor.modify_font(pango.FontDescription('Courier New'))
+
+        buffer = editor.get_buffer()
+        buffer.set_text(version_file.content)
+
+        label = gtk.Label('Version %s' % str(version_file))
+
+        self.notebookMain.append_page(editor, label)
+        self.notebookMain.set_current_page(self.notebookMain.get_n_pages()-1)
 
     # ------------------------------------------------------------------
     # Callbacks 
@@ -88,13 +121,34 @@ class FormMain(forms.Form):
         self.update_widgets()
 
     def on_mniNewVersionFile_activate(self, widget):
-        print 'on_mniNewVersionFile_activate'
+        vers = self.project.add_version_file()
+
+        self.update_widgets()
+
+        self.show_version_editor(vers)
 
     def on_mniEditVersion_activate(self, widget):
-        print 'on_mniEditVersion_activate'
+        sel = self.treeviewObjects.get_selection()
+        model, iter = sel.get_selected()
+        vers = model.get_value(iter, 1)
+
+        if isinstance(vers, models.VersionFile):
+            self.show_version_editor(vers)
 
     def on_mniDeleteVersion_activate(self, widget):
-        print 'on_mniDeleteVersion_activate'
+        sel = self.treeviewObjects.get_selection()
+        model, iter = sel.get_selected()
+        vers = model.get_value(iter, 1)
+
+        if isinstance(vers, models.VersionFile):
+            vers.remove_from_project()
+            self.update_widgets()
+
+    def on_mniCloseVersion_activate(self, widget):
+        page = self.notebookMain.get_current_page()
+
+        if page > 0:
+            self.notebookMain.remove_page(page)
 
     def on_mniOpenProject_activate(self, widget):
         filename = utils.show_open_dialog()
@@ -125,7 +179,7 @@ class FormMain(forms.Form):
         self.on_mniExit_activate(widget)
 
     def on_mniNewConnection_activate(self, widget):
-        form = self.app.forms.get('formConnection', FormConnection(self.app, self.project.add_connection()))
+        self.app.forms.get('formConnection', FormConnection(self.app, self.project.add_connection()))
 
     def on_mniEditConnection_activate(self, widget):
         sel = self.treeviewObjects.get_selection()
@@ -145,5 +199,6 @@ class FormMain(forms.Form):
             self.update_widgets()
 
     def on_mniProjectOptions_activate(self, widget):
-        pass
+        self.app.forms.get('formOptions', FormOptions(self.app, self.project))
+        self.update_widgets()
 
