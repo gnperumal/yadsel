@@ -1,0 +1,1 @@
+{"connections": [{"dsn": "protocol:user:pass@host:port", "driver_class": "Firebird"}, {"dsn": "protocol:user:pass@host:port", "driver_class": "SQLite"}], "version_files": [null], "latest_version": "75", "initial_version": "73", "description": "Version test for this project :)"}
