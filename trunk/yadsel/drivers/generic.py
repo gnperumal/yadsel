@@ -174,38 +174,40 @@ class GenericDriver(Driver):
             self.additional_scripts += [self.__replace_macros(inst.for_create(), obj)]
 
         children = children[:-2]
-        return 'CREATE TABLE %s ( %s );' % ( obj.table_name, children )
+        return 'CREATE TABLE %s ( %s )%s' % ( obj.table_name, children, self.terminate_delimiter )
 
     def generate_script_for_altertable(self, obj):
         children = []
 
         for a in obj.actions:
-            children.append("ALTER TABLE %s %s; " % ( obj.table_name, self.ActionParser(a, self.FieldParser).for_alter() ))
+            children.append("ALTER TABLE %s %s %s " % ( obj.table_name, self.ActionParser(a, self.FieldParser).for_alter() ), self.terminate_delimiter )
 
         return children
 
     def generate_script_for_droptable(self, obj):
-        return 'DROP TABLE %s;' % obj.table_name
+        return 'DROP TABLE %s %s' %( obj.table_name, self.terminate_delimiter )
 
     def generate_script_for_createindex(self, obj):
-        return 'CREATE INDEX %s ON %s ( %s );' %( obj.index_name, obj.table_name, ''.join([c+", " for c in obj.columns])[:-2] )
+        return 'CREATE INDEX %s ON %s ( %s )%s' %( obj.index_name, obj.table_name, ''.join([c+", " for c in obj.columns])[:-2], self.terminate_delimiter )
 
     def generate_script_for_dropindex(self, obj):
-        return 'DROP INDEX %s ON %s;' %( obj.index_name, obj.table_name )
+        return 'DROP INDEX %s ON %s %s' %( obj.index_name, obj.table_name, self.terminate_delimiter )
 
     def generate_script_for_insert(self, obj):
         fields = ''.join([f+", " for f in obj.fields])[:-2]
 
-        ret = 'INSERT INTO %s ( %s ) ' % ( obj.table_name, fields )
+        ins = 'INSERT INTO %s ( %s ) ' % ( obj.table_name, fields )
+        ret = ''
 
         if obj.select:
-            ret += self.generate_script_for_select(obj.select)
+            ret = ins + self.generate_script_for_select(obj.select)
         else:
-            values = ''.join([self.ValueParser(k, obj.values[k]).for_insert()+", " for k in obj.values])[:-2]
-            ret += 'VALUES ( %s );' % values
-        
-        return ret
+            for item in obj.values:
+                values = ''.join([self.ValueParser(k, item[k]).for_insert()+", " for k in item])[:-2]
+                ret += '%s VALUES ( %s )%s' %( ins, values, self.terminate_delimiter )
 
+        return ret
+        
     def generate_script_for_select(self, obj):
         # Fields
         fields = ''.join([f+", " for f in obj.fields])[:-2]

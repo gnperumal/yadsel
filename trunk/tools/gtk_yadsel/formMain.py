@@ -283,10 +283,19 @@ class FormMain(forms.Form):
             self.__update_widgets()
 
     def on_mniSave_activate(self, widget):
+        # Project file
         filename = utils.show_save_dialog()
 
-        if filename:
-            self.project.save_to_file(filename)
+        if not filename: return False
+
+        # Find for new version files still not saved
+        for vers in self.project.version_files:
+            if not vers.filename:
+                vers_filename = utils.show_save_dialog()
+                # ...
+        
+        # Saves project
+        self.project.save_to_file(filename)
 
     def on_mniSaveAs_activate(self, widget):
         self.project.save_to_file(filename)
