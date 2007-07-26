@@ -194,6 +194,8 @@ class GenericDriver(Driver):
         return 'DROP INDEX %s ON %s %s' %( obj.index_name, obj.table_name, self.terminate_delimiter )
 
     def generate_script_for_insert(self, obj):
+        from types import TupleType, DictType
+
         fields = ''.join([f+", " for f in obj.fields])[:-2]
 
         ins = 'INSERT INTO %s ( %s ) ' % ( obj.table_name, fields )
@@ -203,7 +205,10 @@ class GenericDriver(Driver):
             ret = ins + self.generate_script_for_select(obj.select)
         else:
             for item in obj.values:
-                values = ''.join([self.ValueParser(k, item[k]).for_insert()+", " for k in item])[:-2]
+                if type(item) == TupleType:
+                    values = ''.join([self.ValueParser(obj.fields[k], item[k]).for_insert()+", " for k in range(len(item))])[:-2]
+                elif type(item) == DictType:
+                    values = ''.join([self.ValueParser(k, item[k]).for_insert()+", " for k in item])[:-2]
                 ret += '%s VALUES ( %s )%s' %( ins, values, self.terminate_delimiter )
 
         return ret
