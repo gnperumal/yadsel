@@ -153,16 +153,24 @@ class FormMain(forms.Form):
             # Editor definition
             editor = gtksourceview.SourceView()
             editor.set_show_line_numbers(True)
+
+            buffer = gtksourceview.SourceBuffer()
+            editor.set_buffer(buffer)
         else:
             # Editor definition
             editor = gtk.TextView()
-            editor.modify_font(pango.FontDescription('Courier New'))
+            
+            buffer = editor.get_buffer()
+
+        # Courier font
+        editor.modify_font(pango.FontDescription('Courier New'))
 
         # Showing the editor
         editor.show()
 
         # Buffer definition
-        buffer = editor.get_buffer()
+        if version_file.filename:
+            version_file.load_from_file()
         buffer.set_text(version_file.source)
 
         if sourceview_available:
@@ -246,10 +254,18 @@ class FormMain(forms.Form):
 
     def on_mniNewVersionFile_activate(self, widget):
         vers = self.project.add_version_file()
-
         self.__update_widgets()
-
         self.__show_version_editor(vers)
+
+    def on_mniAddVersionFile_activate(self, widget):
+        filename = utils.show_open_dialog(default_extension=utils.PYTHON_FILE_EXTENSION)
+
+        if filename:
+            vers = models.VersionFile(filename=filename)
+            
+            self.project.add_version_file(vers)
+            self.__update_widgets()
+            self.__show_version_editor(vers)
 
     def on_mniEditVersion_activate(self, widget):
         sel = self.treeviewObjects.get_selection()
@@ -284,9 +300,11 @@ class FormMain(forms.Form):
 
     def on_mniSave_activate(self, widget):
         # Project file
-        filename = utils.show_save_dialog()
+        filename = self.project.filename or utils.show_save_dialog()
 
-        if not filename: return False
+        # Quit if no file name to save to
+        if not filename:
+            return False
 
         # Find for new version files still not saved
         for vers in self.project.version_files:
