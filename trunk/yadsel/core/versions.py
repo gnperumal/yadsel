@@ -59,7 +59,7 @@ class Controller(object):
     def script_for_upgrade(self, current=None, to=None):
         self.version_classes.sort(lambda a,b: cmp(a.version_number, b.version_number))
 
-        self.current_version = current or 0
+        self.current_version = current or self.current_version
         to = to or self.version_classes[-1].version_number
         
         versions = [c for c in self.version_classes if c.version_number > self.current_version and c.version_number <= to]
