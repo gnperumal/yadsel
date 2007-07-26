@@ -6,9 +6,10 @@ Model classes module container
 @creation 2007-07-21
 """
 
-import simplejson
+import simplejson, re
 
 class Project(object):
+    filename = None
     initial_version = 0
     latest_version = None
     description = ''
@@ -24,7 +25,9 @@ class Project(object):
     def clear(self):
         pass
 
-    def save_to_file(self, filename):
+    def save_to_file(self, filename=None):
+        self.filename = filename or self.filename
+
         instance = {
             'connections': [{'driver_class': c.driver_class, 'dsn': c.dsn} for c in self.connections],
             'version_files': [v.filename for v in self.version_files],
@@ -34,12 +37,14 @@ class Project(object):
             }
         json = simplejson.dumps(instance)
 
-        f = file(filename, 'w')
+        f = file(self.filename, 'w')
         f.write(json)
         f.close()
 
-    def load_from_file(self, filename):
-        f = file(filename)
+    def load_from_file(self, filename=None):
+        self.filename = filename or self.filename
+
+        f = file(self.filename)
         cont = f.read()
         f.close()
 
@@ -49,16 +54,24 @@ class Project(object):
         self.latest_version = json.get('latest_version', 0)
         self.description = json.get('description', '')
 
-        self.connections = [Connection(c['driver_class'], c['dsn'], project=self) for c in json.get('connections', [])]
-        self.version_files = [VersionFile(v, project=self) for v in json.get('version_files', [])]
+        self.connections = [Connection(c['driver_class'], c['dsn'], project=self) for c in json.get('connections', []) if c]
+        self.version_files = [VersionFile(v, project=self) for v in json.get('version_files', []) if v]
 
     def add_connection(self, conn=None):
-        conn = conn or Connection(project=self)
+        if conn:
+            conn.project = self
+            self.connections.append(conn)
+        else:
+            conn = Connection(project=self)
 
         return conn
 
     def add_version_file(self, vers=None):
-        vers = vers or VersionFile(project=self)
+        if vers:
+            vers.project = self
+            self.version_files.append(vers)
+        else:
+            vers = VersionFile(project=self)
 
         return vers
 
@@ -84,7 +97,7 @@ class Connection(object):
 
 class VersionFile(object):
     project = None
-    source = ''
+    __source = ''
     filename = None
     version_number = None
 
@@ -94,17 +107,17 @@ class VersionFile(object):
         if project:
             project.version_files.append(self)
 
-    def save_to_file(self, filename):
+    def save_to_file(self, filename=None):
         self.filename = filename or self.filename
 
-        f = file(filename, 'w')
+        f = file(self.filename, 'w')
         f.write(self.source)
         f.close()
 
-    def load_from_file(self, filename):
+    def load_from_file(self, filename=None):
         self.filename = filename or self.filename
 
-        f = file(filename)
+        f = file(self.filename)
         self.source = f.read()
         f.close()
 
@@ -117,4 +130,19 @@ class VersionFile(object):
 
     def get_project_index(self):
         return self.project.version_files.index(self)
+
+    def get_version_number(self):
+        r = re.compile("version_number.*=.*([\d]+)")
+        s = r.search(self.__source)
+
+        if s:
+            return int(s.group(1))
+       
+    def get_source(self):
+        return self.__source
+       
+    def set_source(self, value):
+        self.__source = value
+        self.version_number = self.get_version_number()
+    source = property(fget=get_source, fset=set_source)
 

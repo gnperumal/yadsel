@@ -139,6 +139,13 @@
                               </widget>
                             </child>
                             <child>
+                              <widget class="GtkMenuItem" id="mniAddVersionFile">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Add Version File...</property>
+                                <signal name="activate" handler="on_mniAddVersionFile_activate"/>
+                              </widget>
+                            </child>
+                            <child>
                               <widget class="GtkSeparatorMenuItem" id="separatormenuitem4">
                                 <property name="visible">True</property>
                               </widget>
