@@ -4,9 +4,7 @@
 @creation 2007-05-24
 """
 
-import actions
-import fieldtypes
-import constraints
+import actions, fieldtypes, constraints
 from base import Command
 
 # Tables
@@ -57,12 +55,36 @@ class CreateTable(Command):
 
 class AlterTable(Command):
     table_name = None
-    actions = []
+    actions = fields = constraints = []
 
-    def __init__(self, table_name, *args):
+    def __init__(self, table_name, *args, **kwargs):
         self.table_name = table_name
 
-        self.actions = [k for k in args if issubclass(k.__class__, actions.Action)]
+        # Parses no named args
+        for k in args:
+            # Change actions
+            if issubclass(k.__class__, actions.Action):
+                self.actions.append(k)
+            # New fields
+            elif issubclass(k.__class__, fieldtypes.FieldType):
+                self.fields.append(k)
+            # New constraints
+            elif issubclass(k.__class__, constraints.Constraint):
+                self.constraints.append(k)
+
+        # Parses named args
+        for k in kwargs:
+            kwargs[k].name = k
+
+            # Change actions
+            if issubclass(k.__class__, actions.Action):
+                self.actions.append(k)
+            # New fields
+            elif issubclass(kwargs[k].__class__, fieldtypes.FieldType):
+                self.fields.append(kwargs[k])
+            # New constraints
+            elif issubclass(kwargs[k].__class__, constraints.Constraint):
+                self.constraints.append(kwargs[k])
 
 class DropTable(Command):
     table_name = None
