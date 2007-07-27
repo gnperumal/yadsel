@@ -164,19 +164,11 @@ class MSSQLFieldParser(object):
         elif fcls == Decimal or fcls == Numeric:
             ret += " DECIMAL(%d,%d) " % ( self.field.length, self.field.digits )
         elif fcls == Text:
-            if hasattr(self.field, 'segment_size'):
-                segment_size = self.field.segment_size or 4096
-            else:
-                segment_size = 4096
-            
-            ret += " BLOB SUB_TYPE 2 SEGMENT SIZE %d " % segment_size
+            ret += " TEXT " #% self.field.length
         elif fcls == Blob:
-            if hasattr(self.field, 'segment_size'):
-                segment_size = self.field.segment_size or 4096
-            else:
-                segment_size = 4096
-            
-            ret += " BLOB SUB_TYPE 1 SEGMENT SIZE %d " % segment_size
+            ret += " BLOB " #% self.field.length
+        elif fcls == Date:
+            ret += " DATETIME "
         else:
             ret += " %s " % fcls.__name__.upper()
 

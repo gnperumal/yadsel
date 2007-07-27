@@ -35,9 +35,17 @@ def do(versions_path, driver_type, dsn, user, passwd, action, current_version, n
             print "A Python extension called 'kinterbasdb' was not found!"
             sys.exit(1)
 
-        print user, passwd
         connection = kinterbasdb.connect(dsn=dsn, user=user, password=passwd)
         driver = drivers.Firebird
+    elif driver_type == "mssql":
+        try:
+            import pymssql
+        except:
+            print "A Python extension called 'pymssql' was not found!"
+            sys.exit(1)
+
+        connection = None #pymssql.connect(dsn=dsn, user=user, password=passwd)
+        driver = drivers.MSSQL
     elif driver_type == "mysql":
         driver = drivers.MySQL
     elif driver_type == "sqlite":

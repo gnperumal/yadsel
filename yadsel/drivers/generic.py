@@ -180,7 +180,7 @@ class GenericDriver(Driver):
         children = []
 
         for a in obj.actions:
-            children.append("ALTER TABLE %s %s %s " % ( obj.table_name, self.ActionParser(a, self.FieldParser).for_alter() ), self.terminate_delimiter )
+            children.append("ALTER TABLE %s %s %s " % ( obj.table_name, self.ActionParser(a, self.FieldParser).for_alter(), self.terminate_delimiter ))
 
         return children
 
