@@ -27,7 +27,7 @@ class GenericFieldParser(object):
     def for_create(self):
         fcls = self.field.__class__
 
-        if not issubclass(fcls, FieldType):
+        if not issubclass(fcls, FieldType) and not issubclass(fcls, Constraint):
             return ""
 
         ret = self.field.name
@@ -40,23 +40,31 @@ class GenericFieldParser(object):
             ret += " TINYINT "
         elif fcls == Decimal or fcls == Numeric:
             ret += " DECIMAL(%d,%d) " % ( self.field.length, self.field.digits )
+        elif fcls == ForeignKey:
+            ret = " CONSTRAINT %s FOREIGN KEY ( %s ) REFERENCES %s ( %s ) " %(
+                        self.field.name,
+                        ''.join(["%s," % f for f in self.field.fields])[:-1],
+                        self.field.table_name,
+                        ''.join(["%s," % f for f in self.field.foreign_fields])[:-1],
+                        )
         else:
             ret += " %s " % fcls.__name__.upper()
 
-        if self.field.required:
-            ret += " NOT NULL "
+        if issubclass(fcls, FieldType):
+            if self.field.required:
+                ret += " NOT NULL "
 
-        if not self.field.default is None:
-            if fcls in [Varchar, Char, Date, Time, DateTime, Timestamp, Text]:
-                ret += " DEFAULT '%s' " % self.field.default
-            else:
-                ret += " DEFAULT %s " % self.field.default
+            if not self.field.default is None:
+                if fcls in [Varchar, Char, Date, Time, DateTime, Timestamp, Text]:
+                    ret += " DEFAULT '%s' " % self.field.default
+                else:
+                    ret += " DEFAULT %s " % self.field.default
 
-        if self.field.references and self.field.references.__class__ == ForeignKey:
-            ret += " REFERENCES '%s' ('%s') " %( self.field.references.table_name, self.field.references.field_name )
+            if self.field.references and self.field.references.__class__ == ForeignKey:
+                ret += " REFERENCES '%s' ('%s') " %( self.field.references.table_name, self.field.references.field_name )
 
-        if self.field.primary_key:
-            ret += " PRIMARY KEY "
+            if self.field.primary_key:
+                ret += " PRIMARY KEY "
 
         return ret
 
@@ -76,6 +84,7 @@ class GenericActionParser(object):
 
     def for_alter(self):
         acls = self.action.__class__
+        ocls = self.action.object.__class__
 
         if acls == Add:
             return "ADD " + self.FieldParser(self.action.object).for_alter()
@@ -180,7 +189,7 @@ class GenericDriver(Driver):
         children = []
 
         for a in obj.actions:
-            children.append("ALTER TABLE %s %s %s " % ( obj.table_name, self.ActionParser(a, self.FieldParser).for_alter(), self.terminate_delimiter ))
+            children.append("ALTER TABLE %s %s %s " %( obj.table_name, self.ActionParser(a, self.FieldParser).for_alter(), self.terminate_delimiter ))
 
         return children
 

@@ -55,7 +55,9 @@ class CreateTable(Command):
 
 class AlterTable(Command):
     table_name = None
-    actions = fields = constraints = []
+    actions = []
+    fields = []
+    constraints = []
 
     def __init__(self, table_name, *args, **kwargs):
         self.table_name = table_name

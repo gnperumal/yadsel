@@ -150,7 +150,7 @@ class FirebirdFieldParser(object):
     def for_create(self):
         fcls = self.field.__class__
 
-        if not issubclass(fcls, FieldType):
+        if not issubclass(fcls, FieldType) and not issubclass(fcls, Constraint):
             return ""
 
         ret = self.field.name
@@ -177,26 +177,34 @@ class FirebirdFieldParser(object):
                 segment_size = 4096
             
             ret += " BLOB SUB_TYPE 1 SEGMENT SIZE %d " % segment_size
+        elif fcls == ForeignKey:
+            ret = " CONSTRAINT %s FOREIGN KEY ( %s ) REFERENCES %s ( %s ) " %(
+                        self.field.name,
+                        ''.join(["%s," % f for f in self.field.fields])[:-1],
+                        self.field.table_name,
+                        ''.join(["%s," % f for f in self.field.foreign_fields])[:-1],
+                        )
         else:
             ret += " %s " % fcls.__name__.upper()
 
-        if not self.field.default is None:
-            if fcls in [Varchar, Char, Date, Time, DateTime, Timestamp, Text]:
-                ret += " DEFAULT '%s' " % self.field.default
-            else:
-                ret += " DEFAULT %s " % self.field.default
+        if issubclass(fcls, FieldType):
+            if not self.field.default is None:
+                if fcls in [Varchar, Char, Date, Time, DateTime, Timestamp, Text]:
+                    ret += " DEFAULT '%s' " % self.field.default
+                else:
+                    ret += " DEFAULT %s " % self.field.default
 
-        if self.field.required:
-            ret += " NOT NULL "
+            if self.field.required:
+                ret += " NOT NULL "
 
-        #if self.field.references and self.field.references.__class__ == ForeignKey:
-        #    ret += " REFERENCES '%s' ('%s') " %( self.field.references.table_name, self.field.references.field_name )
+            #if self.field.references and self.field.references.__class__ == ForeignKey:
+            #    ret += " REFERENCES '%s' ('%s') " %( self.field.references.table_name, self.field.references.field_name )
 
-        if self.field.primary_key:
-            sql = 'ALTER TABLE %%TABLE_NAME%% \
-                    ADD CONSTRAINT PK_%%TABLE_NAME%% \
-                    PRIMARY KEY (%s);' % self.field.name
-            self.additional_scripts += [sql]
+            if self.field.primary_key:
+                sql = 'ALTER TABLE %%TABLE_NAME%% \
+                        ADD CONSTRAINT PK_%%TABLE_NAME%% \
+                        PRIMARY KEY (%s);' % self.field.name
+                self.additional_scripts += [sql]
 
         return ret
 
