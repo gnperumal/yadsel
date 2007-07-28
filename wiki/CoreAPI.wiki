@@ -6,13 +6,14 @@
 The Core API is a class system, that support DBMS's drivers, DDL and DML statements e version control system.
 
 = Base =
-  * Driver
-  * SchemaInspector
-  * Version
-  * Controller
-  * Command
-  * Action
-  * FieldType
+  * [Driver]
+  * [SchemaInspector]
+  * [Version]
+  * [ComposerVersion] (to do)
+  * [Controller]
+  * [Command]
+  * [Action]
+  * [FieldType]
 
 = SQL Statements =
 
