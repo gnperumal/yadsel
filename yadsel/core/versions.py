@@ -161,11 +161,20 @@ class Controller(object):
         # Call the execution for script
         self.__execute_script(script, versions_list)
 
-class Version(object):
-    version_number = None
+class ExtensibleVersion(object):
+    """
+    ExtensibleVersion provides a generalizated way to script up creation,
+    erasing and modifying database elements through resources of CoreAPI.
+    Don't use this class for any reasons. Use specialization classes that
+    are the right way.
+    @author Marinho Brandao
+    @creation 2007-05-24
+    @modified 2007-07-28 (renamed from Version to ExtensibleVersion)
+    """
     collation = None
     character_set = None
     commands = []
+    partial_versions = [] # Aggregation of partial versions (not implemented)
 
     def do_up(self):
         """Prepare and calls 'up' method"""
@@ -186,6 +195,28 @@ class Version(object):
     def down(self):
         """Don't declare nothing here. Aways overrided by implementations"""
         pass
+
+class Version(ExtensibleVersion):
+    """
+    Version is the right way to write commands to create, erase or modify
+    database elements, knowed by Controller class and must have the
+    version_number value unique (each Version class must have a once value)
+    @author Marinho Brandao
+    @creation 2007-05-24
+    @modified 2007-07-28 (renamed from Version to ExtensibleVersion, and extended from it)
+    """
+    version_number = None
+
+class PartialVersion(ExtensibleVersion):
+    """
+    PartialVersion is the right way to write commands to create, erase or
+    modify database elements, being a part of a unique Version class. This
+    class is util for big modifications in once version_number, when you
+    can declare much PartialVersion classes with part of code, and join them
+    to a Version class.
+    @author Marinho Brandao
+    @creation 2007-07-28
+    """
 
 FULLVERSION_TEMPLATE = "\
 \"\"\" \n\
