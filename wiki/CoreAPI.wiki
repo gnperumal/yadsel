@@ -8,8 +8,9 @@ The Core API is a class system, that support DBMS's drivers, DDL and DML stateme
 = Base =
   * [Driver]
   * [SchemaInspector]
+  * [ExtensibleVersion]
   * [Version]
-  * [ComposerVersion] (todo)
+  * [PartialVersion]
   * [Controller]
   * [Command]
   * [Action]
