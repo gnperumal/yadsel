@@ -97,7 +97,7 @@ class Connection(object):
 
 class VersionFile(object):
     project = None
-    __source = ''
+    __source = __persistent_source = ''
     filename = None
     version_number = None
 
@@ -114,11 +114,14 @@ class VersionFile(object):
         f.write(self.source)
         f.close()
 
+        # Updates perisistent source (for modifying control)
+        self.__persistent_source = self.__source
+
     def load_from_file(self, filename=None):
         self.filename = filename or self.filename
 
         f = file(self.filename)
-        self.source = f.read()
+        self.source = self.__persistent_source = f.read()
         f.close()
 
     def __str__(self):
@@ -132,11 +135,12 @@ class VersionFile(object):
         return self.project.version_files.index(self)
 
     def get_version_number(self):
-        r = re.compile("version_number.*=.*([\d]+)")
-        s = r.search(self.__source)
+        r = re.compile('.*version_number.*=.*(\d+).*')
+        version_number = r.findall(self.__source)
+        print version_number
 
-        if s:
-            return int(s.group(1))
+        if version_number and version_number[0].isdigit():
+            return int(version_number[0])
        
     def get_source(self):
         return self.__source
@@ -145,4 +149,7 @@ class VersionFile(object):
         self.__source = value
         self.version_number = self.get_version_number()
     source = property(fget=get_source, fset=set_source)
+
+    def source_was_modified(self):
+        return self.__source != self.__persistent_source
 

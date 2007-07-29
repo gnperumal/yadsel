@@ -25,4 +25,3 @@ class Version1(Version):
     def down(self):
         DropTable('cities').append_to(self)
         DropTable('states').append_to(self)
-
