@@ -308,9 +308,13 @@ class FormMain(forms.Form):
 
         # Find for new version files still not saved
         for vers in self.project.version_files:
-            if not vers.filename:
-                vers_filename = utils.show_save_dialog()
-                # ...
+            for vw in self.version_widgets.values():
+                if vw['version_file'] == vers:
+                    vers.source = vw['buffer'].get_text(vw['buffer'].get_start_iter(), vw['buffer'].get_end_iter(), include_hidden_chars=True)
+                    break
+
+            if vers.source_was_modified():
+                vers.save_to_file(vers.filename or utils.show_save_dialog())
         
         # Saves project
         self.project.save_to_file(filename)
