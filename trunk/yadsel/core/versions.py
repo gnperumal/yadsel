@@ -8,12 +8,17 @@ from yadsel.core.dbms import Driver
 from yadsel.core.fieldtypes import *
 from yadsel.core.ddl import *
 
+# Available actions to evolution of schema
+ACTION_UP = 'up'
+ACTION_DOWN = 'down'
+
 class Controller(object):
+    """This class control and make the effective changes of schema evolution"""
     connection = None
     driver = None
     current_version = 0
     version_classes = []
-    interactive = False
+    cache = {}
 
     def __init__(self, driver, connection=None, current_version=None):
         self.connection = connection
@@ -36,11 +41,14 @@ class Controller(object):
         import os, sys
         path = os.path.abspath(path)
 
+        # Doesn't accept non-directory path
         if not os.path.isdir(path): return False
 
+        # Appends path to PYTHON_PATH environment variable (dynamicly)
         if not sys.path.count(path):
             sys.path.append(path)
         
+        # Loads classes
         for f in os.listdir(path):
             mod_name, ext = os.path.splitext(f)
             if ext == '.py':
@@ -64,7 +72,7 @@ class Controller(object):
         
         versions = [c for c in self.version_classes if c.version_number > self.current_version and c.version_number <= to]
         
-        return self.__generate_script(versions, 'up')
+        return self.__generate_script(versions, ACTION_UP)
 
     def script_for_downgrade(self, current=None, to=None):
         self.version_classes.sort(lambda a,b: cmp(b.version_number, a.version_number))
@@ -74,9 +82,9 @@ class Controller(object):
         
         versions = [c for c in self.version_classes if c.version_number > to and c.version_number <= self.current_version]
 
-        return self.__generate_script(versions, 'down')
+        return self.__generate_script(versions, ACTION_DOWN)
 
-    def __generate_script(self, versions, do='up'):
+    def __generate_script(self, versions, do=ACTION_UP):
         from types import ListType
 
         ret = {};
@@ -84,7 +92,7 @@ class Controller(object):
         for cls in versions:
             obj = cls()
 
-            if do == 'up':
+            if do == ACTION_UP:
                 obj.do_up()
             else:
                 obj.do_down()
@@ -124,42 +132,43 @@ class Controller(object):
         except Exception, (errno, errmsg):
             print "When executing the following SQL command: '%s', following error ocurred: '%d - %s'" %( command, errno, errmsg )
 
-        if self.interactive:
-            print "Press any key to continue..."
-
     def __execute_script(self, script, versions_sequence):
-        # Loop for sequence of versions
+        # Loop by sequence of versions
         for v in versions_sequence:
-            # Loop for commands
+            # Loop by commands
             for cmd in script[v]:
                 # Execute the single command each by time
                 self.__execute_command(cmd)
 
-    def upgrade(self, current=None, to=None):
-        # Get the generated script
-        script = self.script_for_upgrade()
+    def upgrade(self, current=None, to=None, cacheable=False, force=False, step=None):
+        if not cacheable or force:
+            # Get the generated script
+            self.cache['script'] = self.script_for_upgrade()
 
-        # Get valid version numbers
-        versions_list = script.keys()
+            # Get valid version numbers
+            self.cache['versions_list'] = script.keys()
 
-        # Sort version numbers for upgrading
-        versions_list.sort()
-
-        # Call the execution for script
-        self.__execute_script(script, versions_list)
-
-    def downgrade(self, current=None, to=None):
-        # Get the generated script
-        script = self.script_for_downgrade()
-
-        # Get valid version numbers
-        versions_list = script.keys()
-
-        # Sort version numbers for upgrading
-        versions_list.sort(lambda a,b: cmp(b,a))
+            # Sort version numbers for upgrading
+            self.cache['versions_list'].sort()
 
         # Call the execution for script
-        self.__execute_script(script, versions_list)
+        versions_list = step is not None and self.cache['versions_list'] or self.cache['versions_list'][step]
+        self.__execute_script(self.cache['script'], versions_list)
+
+    def downgrade(self, current=None, to=None, cacheable=False, force=False, step=None):
+        if not cacheable or force:
+            # Get the generated script
+            self.cache['script'] = self.script_for_downgrade()
+
+            # Get valid version numbers
+            self.cache['versions_list'] = script.keys()
+
+            # Sort version numbers for upgrading
+            self.cache['versions_list'].sort(lambda a,b: cmp(b,a))
+
+        # Call the execution for script
+        versions_list = step is not None and self.cache['versions_list'] or self.cache['versions_list'][step]
+        self.__execute_script(self.cache['script'], versions_list)
 
 class ExtensibleVersion(object):
     """
@@ -171,25 +180,43 @@ class ExtensibleVersion(object):
     @creation 2007-05-24
     @modified 2007-07-28 (renamed from Version to ExtensibleVersion)
     """
-    collation = None
-    character_set = None
+    collation = None # Not yet implemented
+    character_set = None # Not yet implemented
     commands = []
-    partial_versions = [] # Aggregation of partial versions (not implemented)
+    partial_versions = [] # Aggregation of partial versions
 
     def do_up(self):
-        """Prepare and calls 'up' method"""
+        """Prepare and calls ACTION_UP method"""
         self.commands = []
 
+        # Calls ACTION_UP method for its commands
         self.up()
+
+        # Get commands of partial version classes
+        for pv_cls in self.partial_versions:
+            pv = pv_cls()
+            pv.do_up()
+            self.commands += pv.commands
 
     def up(self):
         """Don't declare nothing here. Aways overrided by implementations"""
         pass
 
     def do_down(self):
-        """Prepare and calls 'down' method"""
+        """Prepare and calls ACTION_DOWN method"""
         self.commands = []
 
+        # Invert order of partial_versions classes
+        partial_versions = self.partial_versions
+        partial_versions.reverse()
+
+        # Get commands of partial version classes
+        for pv_cls in partial_versions:
+            pv = pv_cls()
+            pv.do_down()
+            self.commands += pv.commands
+
+        # Calls ACTION_UP method for its commands
         self.down()
 
     def down(self):
