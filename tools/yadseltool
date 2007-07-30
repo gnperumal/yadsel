@@ -9,8 +9,16 @@ This module provide a tool for doing migration by a shell line
 import sys
 from yadsel import core, drivers
 
+AVAILABLE_ACTIONS = ( core.ACTION_UP, core.ACTION_DOWN, )
+
+MODE_HIDDEN = 'hidden'
+MODE_STEPS = 'steps'
+MODE_INTERACTIVE = 'interactive'
+MODE_OUTPUT = 'output'
+AVAILABLE_MODES = ( MODE_HIDDEN, MODE_STEPS, MODE_INTERACTIVE, MODE_OUTPUT, )
+
 def print_header():
-    print "Yadsel // http://code.google.com/p/yadsel/\n"
+    print "Yadsel Tool // http://code.google.com/p/yadsel/\n"
 
 def print_help():
     temp = [
@@ -22,12 +30,16 @@ def print_help():
             "  pass=<password>\t\toptional. Default: empty",
             "  from=<current_version>\trequired",
             "  to=<new_version_number>\toptional. Default: latest available version",
-            "  action=[up|down]\t\toptional. Default: up",
+            "  action=[%s]\t\toptional. Default: %s" %( ''.join([m+'|' for m in AVAILABLE_ACTIONS][:-1]), ACTION_UP ),
+            "  mode=[%s]\t\toptional. Default: %s" %( ''.join([m+'|' for m in AVAILABLE_MODES][:-1]), MODE_HIDDEN ),
            ]
 
     print ''.join([l+"\n" for l in temp])
 
-def do(versions_path, driver_type, dsn, user, passwd, action, current_version, new_version):
+def print_if( condition, s ):
+    if condition: print s
+
+def do(versions_path, driver_type, dsn, user, passwd, action, current_version, new_version, mode):
     if driver_type == "firebird":
         try:
             import kinterbasdb
@@ -56,19 +68,27 @@ def do(versions_path, driver_type, dsn, user, passwd, action, current_version, n
 
     controller = core.Controller(driver, connection=connection)
 
-    print "Driver: %s" % controller.driver.__class__.__name__
+    print_if( mode != MODE_HIDDEN, "Driver: %s" % controller.driver.__class__.__name__ )
 
     controller.current_version = current_version
     controller.load_versions_from_path(versions_path)
 
-    if action == 'up':
-        print "Upgrading..."
-        script = controller.script_for_upgrade(to=new_version)
-        #controller.upgrade()
-    elif action == 'down':
-        print "Downgrading..."
-        script = controller.script_for_downgrade(to=new_version)
-        #controller.downgrade()
+    if action == ACTION_UP:
+        print_if( mode != MODE_HIDDEN, "Upgrading..." )
+
+        # Prints script if mode is 'output'
+        if mode == MODE_OUTPUT:
+            script = controller.script_for_upgrade(to=new_version)
+        else:
+            controller.upgrade()
+    elif action == ACTION_DOWN:
+        print_if( mode != MODE_HIDDEN, "Downgrading..." )
+
+        # Prints script if mode is 'output'
+        if mode == MODE_OUTPUT:
+            script = controller.script_for_downgrade(to=new_version)
+        else:
+            controller.downgrade()
 
     for v in script:
         print "/* Version", v, "*/"
@@ -79,9 +99,10 @@ if __name__ == '__main__':
     print_header()
 
     versions_path = dsn = user = current_version = None
-    action = 'up'
+    action = ACTION_UP
     new_version = 0
     passwd = ''
+    mode = MODE_HIDDEN
 
     for arg in sys.argv:
         if arg.startswith('path='):
@@ -100,6 +121,8 @@ if __name__ == '__main__':
             current_version = int(arg.split('=')[1])
         elif arg.startswith('to='):
             new_version = int(arg.split('=')[1]) or new_version
+        elif arg.startswith('mode='):
+            mode = arg.split('=')[1]
 
     if not(versions_path or dsn or user or current_version):
         print_help()
@@ -113,6 +136,7 @@ if __name__ == '__main__':
        user=user,
        passwd=passwd,
        current_version=current_version,
-       new_version=new_version
+       new_version=new_version,
+       mode=mode,
        )
 
