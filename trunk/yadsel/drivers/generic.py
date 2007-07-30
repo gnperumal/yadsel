@@ -4,6 +4,8 @@
 @creation 2007-06-01
 """
 
+from datetime import datetime
+
 from yadsel.core import *
 
 AUTO_CONNECT_COMMANDS = [
@@ -139,12 +141,110 @@ class GenericClauseParser(object):
     def for_delete(self):
         return self.for_parser()
 
+
+class GenericHistoryControl(object):
+    connection = None
+    table_name = 'yadsel_history'
+
+    def __init__(self, connection):
+        self.connection = connection or self.connection
+
+    def prepare_database_elements(self):
+        sql = """
+            CREATE TABLE %s (
+                version_number INTEGER NOT NULL,
+                change_date TIMESTAMP NOT NULL
+            );
+
+            ALTER TABLE %s 
+                ADD CONSTRAINT pk_%s
+                PRIMARY KEY ( version_number, change_date );
+        """ %( self.table_name, self.table_name, self.table_name )
+
+        cur = self.connection.cursor()
+        
+        try:
+            res = cur.execute(sql)
+        except:
+            # Return 'False' if some error did (like "table already exists")
+            return False
+        
+        return True
+
+    def clear_database_elements(self):
+        sql = """
+            DROP TABLE %s;
+        """ %( self.table_name )
+
+        cur = self.connection.cursor()
+
+        try:
+            res = cur.execute(sql)
+        except:
+            # Return 'False' if some error occurred
+            return False
+
+        return True
+
+    def register_version(self, version_number, change_date=None):
+        # Determines date/time of version change by default (now)
+        change_date = change_date or datetime.now()
+
+        sql = """
+            INSERT INTO %s
+             (version_number, change_date)
+            VALUES
+             ('%s', '%d-%d-%d %d:%d:%d')
+        """ %( self.table_name, version_number, change_date.year,
+               change_date.month, change_date.day, change_date.hour, 
+               change_date.minute, change_date.second )
+
+        cur = self.connection.cursor()
+
+        try:
+            res = cur.execute(sql)
+        except:
+            # Return 'False' if some error occurred
+            return False
+
+        return True
+
+    def get_latest_version(self):
+        ret = {
+            'version_number': None,
+            'change_date': None,
+            }
+
+        sql = """
+            SELECT version_number, change_date
+            FROM %s
+            ORDER BY change_date DESC
+        """ %( self.table_name )
+
+        cur = self.connection.cursor()
+
+        try:
+            cur.execute(sql)
+
+            if cur.rowcount:
+                latest = cur.fetchonemap()
+
+                ret['version_number'] = latest['version_number']
+                ret['change_date'] = latest['change_date']
+        except:
+            return None
+
+        return ret
+
+
 class GenericDriver(Driver):
     auto_connect_commands = AUTO_CONNECT_COMMANDS
+    
     class FieldParser(GenericFieldParser): pass
     class ActionParser(GenericActionParser): pass
     class ValueParser(GenericValueParser): pass
     class ClauseParser(GenericClauseParser): pass
+    class HistoryControl(GenericHistoryControl): pass
 
     def __init__(self, connection=None):
         super(GenericDriver, self).__init__(connection)

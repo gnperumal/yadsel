@@ -30,7 +30,7 @@ def print_help():
             "  pass=<password>\t\toptional. Default: empty",
             "  from=<current_version>\trequired",
             "  to=<new_version_number>\toptional. Default: latest available version",
-            "  action=[%s]\t\toptional. Default: %s" %( ''.join([m+'|' for m in AVAILABLE_ACTIONS][:-1]), ACTION_UP ),
+            "  action=[%s]\t\toptional. Default: %s" %( ''.join([m+'|' for m in AVAILABLE_ACTIONS][:-1]), core.ACTION_UP ),
             "  mode=[%s]\t\toptional. Default: %s" %( ''.join([m+'|' for m in AVAILABLE_MODES][:-1]), MODE_HIDDEN ),
            ]
 
@@ -39,7 +39,7 @@ def print_help():
 def print_if( condition, s ):
     if condition: print s
 
-def do(versions_path, driver_type, dsn, user, passwd, action, current_version, new_version, mode):
+def do(versions_path, driver_type, dsn, user, passwd, action, current_version, new_version, mode, test):
     if driver_type == "firebird":
         try:
             import kinterbasdb
@@ -73,36 +73,69 @@ def do(versions_path, driver_type, dsn, user, passwd, action, current_version, n
     controller.current_version = current_version
     controller.load_versions_from_path(versions_path)
 
-    if action == ACTION_UP:
+    if action == core.ACTION_UP:
         print_if( mode != MODE_HIDDEN, "Upgrading..." )
 
         # Prints script if mode is 'output'
         if mode == MODE_OUTPUT:
             script = controller.script_for_upgrade(to=new_version)
+
+            # Print scripts
+            for v in script:
+                print "/* Version", v, "*/"
+                for cmd in script[v]:
+                    print "", cmd
+        elif mode == MODE_HIDDEN:
+            controller.upgrade(test=test)
+        elif mode == MODE_STEPS:
+            # First step for build scripts for cache and gets steps count
+            controller.upgrade(cacheable=True, force=True, step=0, test=test)
+            print 'Step %d of %d: ""' %( 1, controller.cache['steps_count'] )
+
+            # Loop for next steps (if exists)
+            if controller.cache['steps_count'] > 1:
+                for i in range(1, controller.cache['steps_count']):
+                    controller.upgrade(cacheable=True, step=i, test=test)
+                    print 'Step %d of %d: "%s"' %( i+1, controller.cache['steps_count'], "" )
         else:
-            controller.upgrade()
-    elif action == ACTION_DOWN:
+            controller.upgrade(test=test)
+            
+    elif action == core.ACTION_DOWN:
         print_if( mode != MODE_HIDDEN, "Downgrading..." )
 
         # Prints script if mode is 'output'
         if mode == MODE_OUTPUT:
             script = controller.script_for_downgrade(to=new_version)
-        else:
-            controller.downgrade()
 
-    for v in script:
-        print "/* Version", v, "*/"
-        for cmd in script[v]:
-            print "", cmd
+            # Print scripts
+            for v in script:
+                print "/* Version", v, "*/"
+                for cmd in script[v]:
+                    print "", cmd
+        elif mode == MODE_HIDDEN:
+            controller.downgrade(test=test)
+        elif mode == MODE_STEPS:
+            # First step for build scripts for cache and gets steps count
+            controller.downgrade(cacheable=True, force=True, step=0, test=test)
+            print 'Step %d of %d: ""' %( 1, controller.cache['steps_count'] )
+
+            # Loop for next steps (if exists)
+            if controller.cache['steps_count'] > 1:
+                for i in range(1, controller.cache['steps_count']):
+                    controller.downgrade(cacheable=True, step=i, test=test)
+                    print 'Step %d of %d: "%s"' %( i+1, controller.cache['steps_count'], "" )
+        else:
+            controller.downgrade(test=test)
 
 if __name__ == '__main__':
     print_header()
 
     versions_path = dsn = user = current_version = None
-    action = ACTION_UP
+    action = core.ACTION_UP
     new_version = 0
     passwd = ''
     mode = MODE_HIDDEN
+    test = False
 
     for arg in sys.argv:
         if arg.startswith('path='):
@@ -123,6 +156,8 @@ if __name__ == '__main__':
             new_version = int(arg.split('=')[1]) or new_version
         elif arg.startswith('mode='):
             mode = arg.split('=')[1]
+        elif arg == 'test':
+            test = True
 
     if not(versions_path or dsn or user or current_version):
         print_help()
@@ -138,5 +173,6 @@ if __name__ == '__main__':
        current_version=current_version,
        new_version=new_version,
        mode=mode,
+       test=test,
        )
 

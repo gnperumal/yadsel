@@ -12,6 +12,14 @@ class Driver(object):
     connection = None
     additional_scripts = []
 
+    class FieldParser: pass
+    class ConstraintParser: pass
+    class ActionParser: pass
+    class ValueParser: pass
+    class ClauseParser: pass
+    class Inspector: pass
+    class HistoryControl: pass
+
     def __init__(self, connection=None):
         self.connection = connection
         self.additional_scripts = []
@@ -20,24 +28,6 @@ class Driver(object):
         pass
 
     def execute_command(self, command):
-        pass
-
-    class FieldParser:
-        pass
-
-    class ConstraintParser:
-        pass
-
-    class ActionParser:
-        pass
-
-    class ValueParser:
-        pass
-
-    class ClauseParser:
-        pass
-
-    class Inspector:
         pass
 
 class SchemaInspector:
