@@ -140,35 +140,45 @@ class Controller(object):
                 # Execute the single command each by time
                 self.__execute_command(cmd)
 
-    def upgrade(self, current=None, to=None, cacheable=False, force=False, step=None):
+    def upgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False):
         if not cacheable or force:
             # Get the generated script
             self.cache['script'] = self.script_for_upgrade()
 
             # Get valid version numbers
-            self.cache['versions_list'] = script.keys()
+            self.cache['versions_list'] = self.cache['script'].keys()
 
             # Sort version numbers for upgrading
             self.cache['versions_list'].sort()
 
-        # Call the execution for script
-        versions_list = step is not None and self.cache['versions_list'] or self.cache['versions_list'][step]
-        self.__execute_script(self.cache['script'], versions_list)
+            # Set steps count
+            self.cache['steps_count'] = len(self.cache['versions_list'])
 
-    def downgrade(self, current=None, to=None, cacheable=False, force=False, step=None):
+        versions_list = step is not None and self.cache['versions_list'] or self.cache['versions_list'][step]
+
+        # Call the execution for script
+        if not test:
+            self.__execute_script(self.cache['script'], versions_list)
+
+    def downgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False):
         if not cacheable or force:
             # Get the generated script
             self.cache['script'] = self.script_for_downgrade()
 
             # Get valid version numbers
-            self.cache['versions_list'] = script.keys()
+            self.cache['versions_list'] = self.cache['script'].keys()
 
             # Sort version numbers for upgrading
             self.cache['versions_list'].sort(lambda a,b: cmp(b,a))
 
-        # Call the execution for script
+            # Set steps count
+            self.cache['steps_count'] = len(self.cache['versions_list'])
+
         versions_list = step is not None and self.cache['versions_list'] or self.cache['versions_list'][step]
-        self.__execute_script(self.cache['script'], versions_list)
+
+        # Call the execution for script
+        if not test:
+            self.__execute_script(self.cache['script'], versions_list)
 
 class ExtensibleVersion(object):
     """
