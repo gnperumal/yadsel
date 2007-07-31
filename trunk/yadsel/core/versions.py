@@ -41,18 +41,12 @@ class Controller(object):
         import os, sys
         path = os.path.abspath(path)
 
-        # Doesn't accept non-directory path
-        if not os.path.isdir(path): return False
-
         # Appends path to PYTHON_PATH environment variable (dynamicly)
         if not sys.path.count(path):
             sys.path.append(path)
         
         # Loads classes
-        for f in os.listdir(path):
-            mod_name, ext = os.path.splitext(f)
-            if ext == '.py':
-                self.load_classes_version_from_module(mod_name)
+        self.load_classes_version_from_module('yadsel_versions')
 
     def load_classes_version_from_module(self, mod_name):
         module = __import__(mod_name)
