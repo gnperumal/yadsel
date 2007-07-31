@@ -151,15 +151,15 @@ class GenericHistoryControl(object):
 
     def prepare_database_elements(self):
         sql = """
-            CREATE TABLE %s (
+            CREATE TABLE %(t)s (
                 version_number INTEGER NOT NULL,
                 change_date TIMESTAMP NOT NULL
             );
 
-            ALTER TABLE %s 
-                ADD CONSTRAINT pk_%s
+            ALTER TABLE %(t)s 
+                ADD CONSTRAINT pk_%(t)s
                 PRIMARY KEY ( version_number, change_date );
-        """ %( self.table_name, self.table_name, self.table_name )
+        """ %{ 't': self.table_name }
 
         cur = self.connection.cursor()
         
@@ -194,10 +194,8 @@ class GenericHistoryControl(object):
             INSERT INTO %s
              (version_number, change_date)
             VALUES
-             ('%s', '%d-%d-%d %d:%d:%d')
-        """ %( self.table_name, version_number, change_date.year,
-               change_date.month, change_date.day, change_date.hour, 
-               change_date.minute, change_date.second )
+             ('%s', '%s')
+        """ %( self.table_name, version_number, change_date.isoformat(' ')[:19] )
 
         cur = self.connection.cursor()
 
