@@ -4,8 +4,6 @@
 @creation 2007-05-24
 """
 
-VERSION = (0, 1, None)
-
 from ddl import *
 from dml import *
 from versions import *
