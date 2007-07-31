@@ -7,7 +7,15 @@ This is a text file with tests about zip file versions loading. The
 goal is instantiate the Version class and call do_up() method, waiting 
 a normal result, same way they is loaded from a path.
 
-    >>> from core_tests import *
+NOT YET IMPLEMENTED
+
+    >>> from yadsel import *
+
+Initializing Controller:
+
+    >>> controller = Controller(drivers.SQLite, connection=connection)
+
+------------------------------------------
 
 Initializing Version:
 
