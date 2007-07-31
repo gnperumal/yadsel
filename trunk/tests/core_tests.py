@@ -51,6 +51,7 @@ class TestVersion(Version):
     
 if __name__ == '__main__':
     import doctest
-    #doctest.testfile('core_tests_partial_versions.txt')
+    doctest.testfile('core_tests_partial_versions.txt')
     doctest.testfile('core_tests_persistence.txt')
+    doctest.testfile('core_tests_zipfile_versions.txt')
 
