@@ -64,11 +64,19 @@ def do(versions_path, driver_type, dsn, user, passwd, action,
     elif driver_type == "mysql":
         driver = drivers.MySQL
     elif driver_type == "sqlite":
+        try:
+            from pysqlite2 import dbapi2 as sqlite
+        except:
+            print "A Python extension called 'pysqlite2' was not found!"
+            sys.exit(1)
+
+        connection = sqlite.connect(dsn)
         driver = drivers.SQLite
     else:
         print "Only drivers 'Firebird', 'MySQL' and 'SQLite' are supported!"
         sys.exit(1)
 
+    # Instantiates version controller
     controller = core.Controller(driver, connection=connection)
 
     print_if( mode != MODE_HIDDEN, "Driver: %s" % controller.driver.__class__.__name__ )

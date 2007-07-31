@@ -129,8 +129,8 @@ class Controller(object):
     def __execute_command(self, command):
         try:
             self.driver.execute_command(command)
-        except Exception, (errno, errmsg):
-            print "When executing the following SQL command: '%s', following error ocurred: '%d - %s'" %( command, errno, errmsg )
+        except Exception, e:
+            print "When executing the following SQL command: '%s', following error ocurred: '%s'" %( command, e )
 
     def __execute_script(self, script, versions_sequence):
         # Loop by sequence of versions
@@ -141,9 +141,12 @@ class Controller(object):
                 self.__execute_command(cmd)
 
             # Register version
-            self.register_version_history(v)
+            self.current_version = v
+            self.register_version_history(self.current_version)
 
     def upgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False):
+        step = step or 0
+
         if not cacheable or force:
             # Get the generated script
             self.cache['script'] = self.script_for_upgrade()
@@ -196,7 +199,7 @@ class Controller(object):
         latest_version = history.get_latest_version()
 
         # Set current version by latest version number
-        self.current_version = latest_version['version_number'] or 0
+        self.current_version = latest_version and latest_version['version_number'] or 0
 
     def register_version_history(self, version_number):
         if not self.connection: return False

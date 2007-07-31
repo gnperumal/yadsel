@@ -22,6 +22,7 @@ AUTO_CONNECT_COMMANDS = [
 
 class GenericFieldParser(object):
     field = None
+    additional_scripts = []
 
     def __init__(self, obj):
         self.field = obj
@@ -150,12 +151,14 @@ class GenericHistoryControl(object):
         self.connection = connection or self.connection
 
     def prepare_database_elements(self):
-        sql = """
+        sql1 = """
             CREATE TABLE %(t)s (
                 version_number INTEGER NOT NULL,
-                change_date TIMESTAMP NOT NULL
+                change_date DATETIME NOT NULL
             );
+        """ %{ 't': self.table_name }
 
+        sql2 = """
             ALTER TABLE %(t)s 
                 ADD CONSTRAINT pk_%(t)s
                 PRIMARY KEY ( version_number, change_date );
@@ -164,7 +167,8 @@ class GenericHistoryControl(object):
         cur = self.connection.cursor()
         
         try:
-            res = cur.execute(sql)
+            cur.execute(sql1)
+            cur.execute(sql2)
         except:
             # Return 'False' if some error did (like "table already exists")
             return False
@@ -200,8 +204,11 @@ class GenericHistoryControl(object):
         cur = self.connection.cursor()
 
         try:
-            res = cur.execute(sql)
-        except:
+            cur.execute(sql)
+            self.connection.commit()
+
+            cur.execute('select * from yadsel_version')
+        except Exception, e:
             # Return 'False' if some error occurred
             return False
 
@@ -224,15 +231,51 @@ class GenericHistoryControl(object):
         try:
             cur.execute(sql)
 
-            if cur.rowcount:
-                latest = cur.fetchonemap()
+            latest = cur.fetchone()
 
-                ret['version_number'] = latest['version_number']
-                ret['change_date'] = latest['change_date']
-        except:
+            if latest:
+                ret['version_number'], ret['change_date'] = latest
+        except Exception, e:
             return None
 
         return ret
+
+
+class GenericConstraintParser(object):
+    constraint = None
+
+    def __init__(self, obj):
+        self.constraint = obj
+
+    def get_fields(self):
+        ret = ''.join([",%s" % f for f in self.constraint.fields])
+        return ret[1:]
+
+    def get_foreign_fields(self):
+        ret = ''.join([",%s" % f for f in self.constraint.foreign_fields])
+        return ret[1:]
+
+    def for_create(self):
+        fcls = self.constraint.__class__
+
+        if issubclass(fcls, ForeignKey):
+            ret = 'ALTER TABLE %%TABLE_NAME%% \
+                    ADD CONSTRAINT %s \
+                    FOREIGN KEY (%s) \
+                    REFERENCES %s (%s);' %( self.constraint.name, 
+                                            self.get_fields(),
+                                            self.constraint.table_name, 
+                                            self.get_foreign_fields() )
+        else:
+            ret = ''
+
+        return ret
+
+    def for_alter(self):
+        return self.for_create()
+
+    def for_rename(self):
+        return self.for_create()
 
 
 class GenericDriver(Driver):
@@ -243,6 +286,7 @@ class GenericDriver(Driver):
     class ValueParser(GenericValueParser): pass
     class ClauseParser(GenericClauseParser): pass
     class HistoryControl(GenericHistoryControl): pass
+    class ConstraintParser(GenericConstraintParser): pass
 
     def __init__(self, connection=None):
         super(GenericDriver, self).__init__(connection)
