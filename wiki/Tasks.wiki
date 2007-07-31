@@ -25,3 +25,4 @@ This section exists for list project tasks and project members on a responsabili
 ||[RoutineTranslator]||nobody||not started||||
 ||[FullVersionBuilder]||MarinhoBrandao||started||2007-06-04||
 ||[SchemaComparer]||nobody||started||2007-06-03||
+||[Tests]||MarinhoBrandao||started||2007-07-31||
