@@ -7,7 +7,7 @@
 import re
 
 from yadsel.core import *
-from generic import GenericDriver
+from generic import GenericDriver, GenericHistoryControl
 
 class FirebirdInspector(SchemaInspector):
     def get_tables_list(self):
@@ -189,7 +189,7 @@ class FirebirdFieldParser(object):
 
         if issubclass(fcls, FieldType):
             if not self.field.default is None:
-                if fcls in [Varchar, Char, Date, Time, DateTime, Timestamp, Text]:
+                if fcls in [Varchar, Char, Date, Time, DateTime, Timestamp, Text] and self.field.default.lower() not in ['current_date', 'current_time', 'current_datetime']:
                     ret += " DEFAULT '%s' " % self.field.default
                 else:
                     ret += " DEFAULT %s " % self.field.default
@@ -250,10 +250,19 @@ class FirebirdConstraintParser(object):
     def for_rename(self):
         return self.for_create()
 
+class FirebirdHistoryControl(GenericHistoryControl):
+    sql_createtable = """
+        CREATE TABLE %(t)s (
+            version_number INTEGER NOT NULL,
+            change_date TIMESTAMP NOT NULL
+        );
+    """
+
 class FirebirdDriver(GenericDriver):
     class Inspector(FirebirdInspector): pass
     class FieldParser(FirebirdFieldParser): pass
     class ConstraintParser(FirebirdConstraintParser): pass
+    class HistoryControl(FirebirdHistoryControl): pass
 
     def __init__(self, connection=None):
         super(FirebirdDriver, self).__init__(connection)
@@ -277,12 +286,5 @@ class FirebirdDriver(GenericDriver):
             return command
 
     def generate_script_for_executesql(self, obj):
-        if obj.terminator != ';':
-            ret  = "SET TERM %s ;\n" % obj.terminator
-            ret += "%s%s\n" %( obj.sql, obj.terminator )
-            ret += "SET TERM ; %s\n" % obj.terminator
-        else:
-            ret = obj.sql + obj.terminator
-
-        return ret
+        return obj.sql
 

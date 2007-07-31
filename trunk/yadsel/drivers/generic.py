@@ -147,43 +147,59 @@ class GenericHistoryControl(object):
     connection = None
     table_name = 'yadsel_history'
 
+    sql_createtable = """
+        CREATE TABLE %(t)s (
+            version_number INTEGER NOT NULL,
+            change_date DATETIME NOT NULL
+        );
+    """
+
+    sql_createpk = """
+        ALTER TABLE %(t)s 
+            ADD CONSTRAINT pk_%(t)s
+            PRIMARY KEY ( version_number, change_date );
+    """
+
+    sql_droptable = """
+        DROP TABLE %s;
+    """
+
+    sql_registerversion = """
+        INSERT INTO %s
+         (version_number, change_date)
+        VALUES
+        ('%s', '%s')
+    """
+
     def __init__(self, connection):
         self.connection = connection or self.connection
 
     def prepare_database_elements(self):
-        sql1 = """
-            CREATE TABLE %(t)s (
-                version_number INTEGER NOT NULL,
-                change_date DATETIME NOT NULL
-            );
-        """ %{ 't': self.table_name }
-
-        sql2 = """
-            ALTER TABLE %(t)s 
-                ADD CONSTRAINT pk_%(t)s
-                PRIMARY KEY ( version_number, change_date );
-        """ %{ 't': self.table_name }
+        sql1 = self.sql_createtable %{ 't': self.table_name }
+        sql2 = self.sql_createpk %{ 't': self.table_name }
 
         cur = self.connection.cursor()
-        
+            
         try:
             cur.execute(sql1)
+            self.connection.commit()
+            
             cur.execute(sql2)
-        except:
+            self.connection.commit()
+        except Exception, e:
             # Return 'False' if some error did (like "table already exists")
             return False
         
         return True
 
     def clear_database_elements(self):
-        sql = """
-            DROP TABLE %s;
-        """ %( self.table_name )
+        sql = self.sql_droptable %( self.table_name )
 
         cur = self.connection.cursor()
 
         try:
             res = cur.execute(sql)
+            self.connection.commit()
         except:
             # Return 'False' if some error occurred
             return False
@@ -194,12 +210,7 @@ class GenericHistoryControl(object):
         # Determines date/time of version change by default (now)
         change_date = change_date or datetime.now()
 
-        sql = """
-            INSERT INTO %s
-             (version_number, change_date)
-            VALUES
-             ('%s', '%s')
-        """ %( self.table_name, version_number, change_date.isoformat(' ')[:19] )
+        sql = self.sql_registerversion %( self.table_name, version_number, change_date.isoformat(' ')[:19] )
 
         cur = self.connection.cursor()
 
@@ -350,7 +361,7 @@ class GenericDriver(Driver):
         fields = ''.join([f+", " for f in obj.fields])[:-2]
 
         ins = 'INSERT INTO %s ( %s ) ' % ( obj.table_name, fields )
-        ret = ''
+        ret = []
 
         if obj.select:
             ret = ins + self.generate_script_for_select(obj.select)
@@ -360,7 +371,7 @@ class GenericDriver(Driver):
                     values = ''.join([self.ValueParser(obj.fields[k], item[k]).for_insert()+", " for k in range(len(item))])[:-2]
                 elif type(item) == DictType:
                     values = ''.join([self.ValueParser(k, item[k]).for_insert()+", " for k in item])[:-2]
-                ret += '%s VALUES ( %s )%s' %( ins, values, self.terminate_delimiter )
+                ret += ['%s VALUES ( %s )' %( ins, values )]
 
         return ret
         
