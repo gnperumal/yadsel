@@ -140,6 +140,9 @@ class Controller(object):
                 # Execute the single command each by time
                 self.__execute_command(cmd)
 
+            # Register version
+            self.register_version_history(v)
+
     def upgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False):
         if not cacheable or force:
             # Get the generated script
@@ -179,6 +182,34 @@ class Controller(object):
         # Call the execution for script
         if not test:
             self.__execute_script(self.cache['script'], versions_list)
+
+    def load_current_version_from_history(self):
+        if not self.connection: return False
+
+        # Instantiates history control
+        history = self.driver.HistoryControl(self.connection)
+
+        # Tries to prepare database for this (if not yet)
+        history.prepare_database_elements()
+
+        # Get latest version and change date/time
+        latest_version = history.get_latest_version()
+
+        # Set current version by latest version number
+        self.current_version = latest_version['version_number'] or 0
+
+    def register_version_history(self, version_number):
+        if not self.connection: return False
+
+        # Instantiates history control
+        history = self.driver.HistoryControl(self.connection)
+
+        # Tries to prepare database for this (if not yet)
+        history.prepare_database_elements()
+
+        # Register new version to history control
+        return history.register_version(version_number)
+
 
 class ExtensibleVersion(object):
     """
