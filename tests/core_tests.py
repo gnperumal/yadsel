@@ -28,6 +28,7 @@ class Tables(PartialVersion):
         DropTable('persons').append_to(self)
         DropTable('categories').append_to(self)
 
+
 class Data(PartialVersion):
     def up(self):
         Insert('categories',
@@ -40,11 +41,16 @@ class Data(PartialVersion):
             Where(id = 1),
         ).append_to(self)
 
+
 class TestVersion(Version):
     version_number = 1
-    partial_versions = [Tables, Data]
+
+    def __init__(self):
+        self.partial_versions = [Tables, Data]
+
     
 if __name__ == '__main__':
     import doctest
-    doctest.testfile('core_tests_partial_versions.txt')
+    #doctest.testfile('core_tests_partial_versions.txt')
+    doctest.testfile('core_tests_persistence.txt')
 

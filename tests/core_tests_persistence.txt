@@ -1,0 +1,78 @@
+The ``core`` module
+===================
+
+Using ``SQLite``, test of persistence and history control
+
+This is a text file with tests about persistence, using version 
+classes available in core_tests.py module. The goal is instantiate
+the Version class and call do_up() method, creating the database
+elements and updating history control.
+
+    >>> from core_tests import *
+    >>> from yadsel import *
+    >>> from pysqlite2 import dbapi2 as sqlite
+    >>> import os
+
+------------------------------------------
+
+Initializing SQLite Connection:
+
+    >>> connection = sqlite.connect('test.db')
+
+------------------------------------------
+
+Initializing Controller:
+
+    >>> controller = Controller(drivers.SQLite, connection=connection)
+
+------------------------------------------
+
+Testing history control:
+
+    >>> controller.load_current_version_from_history()
+    >>> print controller.current_version
+    0
+
+------------------------------------------
+
+Append TestVersion class to version classes list of controller
+
+    >>> controller.version_classes = [TestVersion]
+
+------------------------------------------
+
+Outputs upgrade script to a file
+
+    >>> f = file('output.sql', 'w')
+    >>> script = controller.script_for_upgrade()
+    >>> for k in script:
+    ...     f.writelines(script[k])
+    >>> f.close()
+
+------------------------------------------
+
+Calls for 'upgrade' method
+
+    >>> if controller.current_version == 0:
+    ...     controller.upgrade()
+
+------------------------------------------
+
+Tests current version
+
+    >>> print controller.current_version
+    1
+
+------------------------------------------
+
+Close connection
+
+    >>> connection.close()
+
+------------------------------------------
+
+Delete database file
+
+    >>> os.unlink('test.db')
+
+

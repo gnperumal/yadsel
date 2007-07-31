@@ -42,3 +42,4 @@ Now, the commands:
 
     >>> print [cmd.__class__.__name__ for cmd in version.commands]
     ['Delete', 'DropTable', 'DropTable']
+

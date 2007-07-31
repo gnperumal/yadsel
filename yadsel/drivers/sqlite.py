@@ -94,8 +94,34 @@ class SQLiteInspector(SchemaInspector):
     def get_domains_list(self):
         return []
 
+
+class SQLiteConstraintParser(object):
+    constraint = None
+
+    def __init__(self, obj):
+        self.constraint = obj
+
+    def get_fields(self):
+        ret = ''.join([",%s" % f for f in self.constraint.fields])
+        return ret[1:]
+
+    def get_foreign_fields(self):
+        ret = ''.join([",%s" % f for f in self.constraint.foreign_fields])
+        return ret[1:]
+
+    def for_create(self):
+        return ''
+
+    def for_alter(self):
+        return self.for_create()
+
+    def for_rename(self):
+        return self.for_create()
+
+
 class SQLiteDriver(GenericDriver):
     class Inspector(SQLiteInspector): pass
+    class ConstraintParser(SQLiteConstraintParser): pass
 
     def __init__(self, connection=None):
         super(SQLiteDriver, self).__init__(connection)
