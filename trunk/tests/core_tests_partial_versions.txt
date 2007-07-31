@@ -1,0 +1,44 @@
+The ``core`` module
+===================
+
+Using ``PartialVersion``
+
+This is a text file with tests about PartialVersion, using version 
+classes available in core_tests.py module. The goal is instantiate
+the Version class and call do_up() method, waiting a result with
+partial versions commands (Tables and Data, in this order).
+
+    >>> from core_tests import *
+
+Initializing Version:
+
+    >>> version = TestVersion()
+
+------------------------------------------
+
+Partial versions list test:
+
+    >>> print version.partial_versions
+    [<class 'core_tests.Tables'>, <class 'core_tests.Data'>]
+
+------------------------------------------
+
+do_up() method call:
+
+    >>> version.do_up()
+
+Now, the commands:
+
+    >>> print [cmd.__class__.__name__ for cmd in version.commands]
+    ['CreateTable', 'CreateTable', 'Insert']
+
+------------------------------------------
+
+do_down() method call:
+
+    >>> version.do_down()
+
+Now, the commands:
+
+    >>> print [cmd.__class__.__name__ for cmd in version.commands]
+    ['Delete', 'DropTable', 'DropTable']
