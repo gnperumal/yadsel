@@ -40,7 +40,7 @@ includes = []
 excludes = ['Tkconstants', 'Tkinter', '_gtkagg', '_tkagg', 'bsddb',
             'curses', 'email', 'pywin.debugger', 'pywin.debugger.dbgcon',
             'pywin.dialogs', 'tcl']
-packages = []
+packages = ['encodings', 'kinterbasdb']
 dll_excludes = ['libgdk-win32-2.0-0.dll', 'libgobject-2.0-0.dll', 'tcl84.dll',
                 'tk84.dll']
 icon_resources = []
@@ -97,4 +97,5 @@ setup(
 
 
 # And we are done. That's a setup script :-D
+
 
