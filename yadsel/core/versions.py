@@ -154,6 +154,10 @@ class Controller(object):
             # Set steps count
             self.cache['steps_count'] = len(self.cache['versions_list'])
 
+        # Exit if no versions found
+        if not self.cache['versions_list']:
+            return False
+
         versions_list = step is not None and self.cache['versions_list'] or self.cache['versions_list'][step]
 
         # Call the execution for script
