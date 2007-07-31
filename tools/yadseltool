@@ -28,10 +28,12 @@ def print_help():
             "  dsn=<dsn>\t\t\trequired",
             "  user=<username>\t\trequired",
             "  pass=<password>\t\toptional. Default: empty",
-            "  from=<current_version>\trequired",
+            "  from=<current_version>\toptional. Default: latest version of history control",
             "  to=<new_version_number>\toptional. Default: latest available version",
             "  action=[%s]\t\toptional. Default: %s" %( ''.join([m+'|' for m in AVAILABLE_ACTIONS][:-1]), core.ACTION_UP ),
             "  mode=[%s]\t\toptional. Default: %s" %( ''.join([m+'|' for m in AVAILABLE_MODES][:-1]), MODE_HIDDEN ),
+            "  test\t\t\t\toptional. Turns off persistent changings on database",
+            "  history\t\t\toptional. Turns on history control on database",
            ]
 
     print ''.join([l+"\n" for l in temp])
@@ -39,7 +41,8 @@ def print_help():
 def print_if( condition, s ):
     if condition: print s
 
-def do(versions_path, driver_type, dsn, user, passwd, action, current_version, new_version, mode, test):
+def do(versions_path, driver_type, dsn, user, passwd, action, 
+       current_version, new_version, mode, test, history):
     if driver_type == "firebird":
         try:
             import kinterbasdb
@@ -70,7 +73,12 @@ def do(versions_path, driver_type, dsn, user, passwd, action, current_version, n
 
     print_if( mode != MODE_HIDDEN, "Driver: %s" % controller.driver.__class__.__name__ )
 
-    controller.current_version = current_version
+    # Gets current version
+    if history and not current_version:
+        controller.load_current_version_from_history()
+    else:
+        controller.current_version = current_version
+
     controller.load_versions_from_path(versions_path)
 
     if action == core.ACTION_UP:
@@ -135,7 +143,7 @@ if __name__ == '__main__':
     new_version = 0
     passwd = ''
     mode = MODE_HIDDEN
-    test = False
+    test = history = False
 
     for arg in sys.argv:
         if arg.startswith('path='):
@@ -158,6 +166,8 @@ if __name__ == '__main__':
             mode = arg.split('=')[1]
         elif arg == 'test':
             test = True
+        elif arg == 'history':
+            history = True
 
     if not(versions_path or dsn or user or current_version):
         print_help()
@@ -174,5 +184,6 @@ if __name__ == '__main__':
        new_version=new_version,
        mode=mode,
        test=test,
+       history=history,
        )
 
