@@ -17,6 +17,6 @@ Class tree:
 
 = Dependences =
 
-This module depends of *MySQLdb* library, the most popular driver for MySQL on Python language. You can see more about *(and download it)* on its official website: [1]
+This module depends of *MySQLdb* library, the most popular driver for MySQL on Python language. You can see more about *(and download it)* on its official website: *1*
 
-[1] http://mysql-python.sourceforge.net/
+  # http://mysql-python.sourceforge.net/
