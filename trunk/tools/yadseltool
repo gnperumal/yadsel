@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-This module provide a tool for doing migration by a shell line
+This module provide a tool for doing migration by shell line
 @author Marinho Brandao
 @creation 2007-05-25
 """
