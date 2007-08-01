@@ -1,0 +1,107 @@
+#summary This module provide a tool for doing migration by command line.
+#labels Phase-Deploy
+
+= Introduction =
+
+This tool provides the basic operations of version upgrading/downgrading by command line. A compiled tool called *yadseltool.exe* can be used and packaged with Windows applications, like some had developed on my job.
+
+= Details =
+
+This tool runs like others command lines tools: receives some arguments and its values and processes this arguments to do things.
+
+The arguments be:
+
+== path ==
+Receives a directory or zip file path that contents modules with version classes.
+
+Syntax:
+path="<version_files_path>"
+
+== dsn ==
+Receives a DSN string for database connection.
+
+Syntax:
+dsn="<host>[/<port>]:<database_name or database_path>"
+
+== user ==
+Receives the user name to connect to database.
+
+Syntax:
+user=<username>
+
+== pass ==
+Receives the password of user to connect to database.
+
+Syntax:
+pass=<password>
+
+== from ==
+Receives the current version enforced to Controller consider for upgrading/downgrading. If this argument is empty or zero (0), the Controller will verify latest version change on database by the table yadsel_versions, if *history* argument was typed.
+
+optional
+
+Syntax:
+from=<version_number>
+
+Default: latest version of history control
+
+== to == 
+Receives the version that Controller must upgrade or downgrade to. If this argument is empty or zero (0), the latest version available in versions *path* argumento will be assumed.
+
+optional
+
+Syntax:
+to=<version_number>
+
+Default: latest available version
+
+== action ==
+Receives the action that the user wants. Can be 'up' or 'down', respectively for *upgrade* and *downgrade*.
+
+optional
+
+Syntax:
+action=[up|down]
+
+Default: *up*
+
+== mode ==
+Receives the mode of action that yadseltool will. Can be one of below:
+
+  * *output*
+    * writes the script to screen, and does not persists to database;
+  * *hidden*
+    * persists changes to database without shows nothing on screen;
+  * *steps*
+    * persists changes to database, writing each step on screen (good for be used embedded in other applications;
+  * *interactive*
+    * persists changes to database, writing each step on screen for user confirmation
+
+optional
+
+Syntax:
+mode=[output|hidden|steps|interactive]
+
+Default: *hidden*
+
+== test ==
+If declared, no changes will persist.
+
+optional
+
+Syntax:
+test
+
+== history ==
+If declared, turns on history control on database.
+
+optional
+
+Syntax:
+history
+
+== Dependences ==
+
+This module depends of py2exe extension *1*, for create an executable file to be packaged in Windows applications.
+
+  # [http://www.py2exe.org/]
