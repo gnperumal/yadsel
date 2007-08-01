@@ -26,3 +26,4 @@ This section exists for list project tasks and project members on a responsabili
 ||[FullVersionBuilder]||MarinhoBrandao||started||2007-06-04||
 ||[SchemaComparer]||nobody||started||2007-06-03||
 ||[Tests]||MarinhoBrandao||started||2007-07-31||
+||[YadselTool]||MarinhoBrandao||started||2007-05-25||
