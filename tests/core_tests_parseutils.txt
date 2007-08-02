@@ -1,0 +1,36 @@
+The ``core`` module
+===================
+
+Using ``parseutils``
+
+This is a text file with tests about parseutils module.
+
+    >>> from yadsel.core import parseutils
+    >>> from yadsel.core import Integer, Varchar
+
+------------------------------------------
+
+Translate operation:
+
+    >>> parseutils.translate_operation('notequal')
+    '<>'
+    >>> parseutils.translate_operation('lt')
+    '<'
+    >>> parseutils.translate_operation('lte')
+    '<='
+    >>> parseutils.translate_operation('gt')
+    '>'
+    >>> parseutils.translate_operation('gte')
+    '>='
+    >>> parseutils.translate_operation('like')
+    'like'
+
+------------------------------------------
+
+Find field:
+
+    >>> fields_list = [Integer(name='id'), Varchar(length=50, name='first_name')]
+    >>> parseutils.find_field(fields_list, 'id').name
+    'id'
+    >>> parseutils.find_field(fields_list, 'username')
+    
