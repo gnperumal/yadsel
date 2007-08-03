@@ -15,7 +15,7 @@ This section exists for list project tasks and project members on a responsabili
 ||[SQLiteDriver]||[MarinhoBrandao]||started||2007-06-01||
 ||[GenericDriver]||[MarinhoBrandao]||started||2007-06-01||
 ||[FirebirdDriver]||MarinhoBrandao||started||2007-06-11||
-||[PostgreSQLDriver]||[andrewsmedina]||not started||||
+||[PostgreSQLDriver]||[MarinhoBrandao]||started||2007-08-02||
 ||[MSSQLDriver]||MarinhoBrandao||started||2007-07-26||
 ||[OracleDriver]||[andrewsmedina]||not started||||
 ||[DjangoDriver]||nobody||not started||||
