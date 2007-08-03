@@ -41,14 +41,18 @@ class PostgresInspector(SchemaInspector):
                  case when t.typname = 'numeric' then a.atttypmod - (a.atttypmod / 65536) * 65536 - 4 \
                       else 0 end as scale, \
                  a.atttypid as type_code, \
-                 t.typname as type_name \
+                 t.typname as type_name, \
+                 case when pk.oid is null then False else True end as primary_key \
                 from pg_attribute a join pg_class c on a.attrelid = c.oid \
                                     join pg_type t on a.atttypid = t.oid \
                                left join pg_attrdef d on a.attrelid = d.adrelid \
                                                      and a.attnum = d.adnum \
+                               left join pg_constraint pk on c.oid = pk.conrelid \
+                                                         and a.attnum = any(pk.conkey) \
                 where c.relkind = 'r' \
                   and a.attnum > 0 \
                   and c.relname = '%s' \
+                  and (pk.contype is null or pk.contype = 'p') \
                 order by c.relname, a.attnum \
                 " % table_name)
 
@@ -63,27 +67,25 @@ class PostgresInspector(SchemaInspector):
             ft = r['type_name'].strip()
             field_name = r['field_name'].strip()
 
-            if ft == 'VARYING':
+            if ft == 'varchar':
                 col = Varchar(r['field_length'])
-            elif ft == 'TEXT':
-                col = Char(r['field_length'])
-            elif ft == 'LONG':
+            elif ft == 'bpchar':
+                col = Char(r['field_length']) # field_length IS NOT OK
+            elif ft == 'int4':
                 col = Integer()
-            elif ft == 'DATE':
+            elif ft == 'date':
                 col = Date()
-            elif ft in ['INT64']:
+            elif ft in ['numeric']:
                 col = Decimal(r['field_length'], r['scale'] * -1)
-            elif ft == 'SHORT':
+            elif ft == 'int2':
                 col = SmallInt()
-            elif ft == 'TIME':
+            elif ft == 'time':
                 col = Time()
-            elif ft == 'TIMESTAMP':
+            elif ft == 'timestamp':
                 col = Timestamp()
-            elif ft == 'FLOAT':
+            elif ft == 'float8':
                 col = Float()
-            elif ft == 'DOUBLE': # to be verified
-                col = Float()
-            elif ft == 'BLOB':
+            elif ft == 'text':
                 col = Text()
             else:
                 print "Field type not identified: %s %s" %( r[1], r[2] )
@@ -91,25 +93,15 @@ class PostgresInspector(SchemaInspector):
 
             col.name = field_name
             col.required = r['required'] == 1
+            col.primary_key = r['primary_key']
 
-            # Takes the default value
-            if r['default_source']:
-                reg = re.compile("^(DEFAULT [']{0,1})([^']*).*", re.IGNORECASE)
-                m = reg.match(r['default_source'].strip())
-                col.default = `m.group(2)`
+            # Takes the default value - TO BE IMPLEMENTED
+            #if r['default_source']:
+            #    reg = re.compile("^(DEFAULT [']{0,1})([^']*).*", re.IGNORECASE)
+            #    m = reg.match(r['default_source'].strip())
+            #    col.default = `m.group(2)`
             
             ret.append(col)
-
-        # Takes primary key information from RDB$INDEX_SEGMENTS and RDB$RELATION_CONSTRAINTS tables
-        cur.execute("\
-                SELECT I.rdb$field_name as field_name \
-                FROM rdb$index_segments I \
-                JOIN rdb$relation_constraints RC ON I.rdb$index_name = RC.rdb$index_name \
-                WHERE RC.rdb$relation_name = '%s' \
-                  AND RC.rdb$constraint_type = 'PRIMARY KEY' \
-                " % table_name)
-        for f in cur.fetchallmap():
-            parseutils.find_field(ret, f['field_name'].strip()).primary_key = True
 
         return ret
 
@@ -118,20 +110,34 @@ class PostgresInspector(SchemaInspector):
 
         cur = self.connection.cursor()
         cur.execute("\
-                SELECT \
-                 I.rdb$field_name as field_name, \
-                 RC.rdb$constraint_name as constraint_name, \
-                 PK.rdb$relation_name as foreign_table \
-                FROM rdb$index_segments I \
-                JOIN rdb$relation_constraints RC ON I.rdb$index_name = RC.rdb$index_name \
-                JOIN rdb$ref_constraints RF ON RC.rdb$constraint_name = RF.rdb$constraint_name \
-                JOIN rdb$relation_constraints PK ON RF.rdb$const_name_uq = PK.rdb$constraint_name \
-                WHERE RC.rdb$relation_name = '%s' \
-                  AND RC.rdb$constraint_type = 'FOREIGN KEY' \
+                select \
+                 p.conname as constraint_name, \
+                 cf.relname as foreign_table \
+                from pg_constraint p join pg_class c on p.conrelid = c.oid \
+                                     join pg_class cf on p.confrelid = cf.oid \
+                where p.contype = 'f' \
+                  and c.relname = '%s' \
                 " % table_name)
         
         for f in cur.fetchallmap():
-            ret.append( ForeignKey(f['field_name'].strip(), f['foreign_table'].strip(), 'GUID', f['constraint_name'].strip()) )
+            # Fields list
+            fields = foreign_fields = []
+            cur.execute("\
+                select \
+                 a.attname as field_name, \
+                 af.attname as foreign_field_name \
+                from pg_constraint fk, \
+                     pg_attribute a, \
+                     pg_attribute af \
+                where fk.conname = '%s' \
+                  and a.attrelid = fk.conrelid \
+                  and a.attnum = any(fk.conkey) \
+                  and af.attrelid = fk.confrelid \
+                  and af.attnum = any(fk.confkey) \
+            " % f['constraint_name'].strip() )
+            # TO DO
+
+            ret.append( ForeignKey(fields, f['foreign_table'].strip(), foreign_fields, f['constraint_name'].strip()) )
 
         return ret
 
