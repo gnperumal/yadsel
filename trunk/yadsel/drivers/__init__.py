@@ -9,4 +9,5 @@ from mysql import MySQLDriver as MySQL
 from sqlite import SQLiteDriver as SQLite
 from firebird import FirebirdDriver as Firebird
 from mssql import MSSQLDriver as MSSQL
+from pgsql import PostgresDriver as Postgres
 

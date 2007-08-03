@@ -22,11 +22,11 @@ class ForeignKey(Constraint):
     foreign_fields = ()
 
     def __init__(self, fields, table_name, foreign_fields, name=None):
-        from types import TupleType
+        from types import TupleType, ListType
         self.table_name, self.name = table_name, name
 
-        self.fields = type(fields) == TupleType and fields or (fields,)
-        self.foreign_fields = type(foreign_fields) == TupleType and foreign_fields or (foreign_fields,)
+        self.fields = type(fields) in (TupleType,ListType) and fields or (fields,)
+        self.foreign_fields = type(foreign_fields) in (TupleType,ListType) and foreign_fields or (foreign_fields,)
 
     def to_script(self):
         """
