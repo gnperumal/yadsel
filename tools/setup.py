@@ -42,7 +42,7 @@ excludes = ['Tkconstants', 'Tkinter', '_gtkagg', '_tkagg', 'bsddb',
             'pywin.dialogs', 'tcl']
 packages = ['encodings', 'kinterbasdb']
 dll_excludes = ['libgdk-win32-2.0-0.dll', 'libgobject-2.0-0.dll', 'tcl84.dll',
-                'tk84.dll']
+                'tk84.dll','msvcr71.dll']
 icon_resources = []
 bitmap_resources = []
 other_resources = []
