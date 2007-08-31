@@ -24,6 +24,7 @@ def print_help():
     temp = [
             "Invalid syntax. You must declare required parameters, like below:",
             "",
+            "  driver=<drive_name>\n",
             "  path=<version_files_path>\n",
             "  dsn=<dsn>\n",
             "  user=<username>\n",
@@ -43,6 +44,8 @@ def print_if( condition, s ):
 
 def do(versions_path, driver_type, dsn, user, passwd, action, 
        current_version, new_version, mode, test, history):
+    connection = None
+
     if driver_type == "firebird":
         try:
             import kinterbasdb
@@ -50,7 +53,9 @@ def do(versions_path, driver_type, dsn, user, passwd, action,
             print "A Python extension called 'kinterbasdb' was not found!"
             sys.exit(1)
 
-        connection = kinterbasdb.connect(dsn=dsn, user=user, password=passwd)
+        if dsn:
+            connection = kinterbasdb.connect(dsn=dsn, user=user, password=passwd)
+            
         driver = drivers.Firebird
     elif driver_type == "mssql":
         try:
@@ -59,7 +64,9 @@ def do(versions_path, driver_type, dsn, user, passwd, action,
             print "A Python extension called 'pymssql' was not found!"
             sys.exit(1)
 
-        connection = None #pymssql.connect(dsn=dsn, user=user, password=passwd)
+        if dsn:
+            connection = None #pymssql.connect(dsn=dsn, user=user, password=passwd)
+            
         driver = drivers.MSSQL
     elif driver_type == "mysql":
         driver = drivers.MySQL
@@ -70,7 +77,9 @@ def do(versions_path, driver_type, dsn, user, passwd, action,
             print "A Python extension called 'pysqlite2' was not found!"
             sys.exit(1)
 
-        connection = sqlite.connect(dsn)
+        if dsn:
+            connection = sqlite.connect(dsn)
+
         driver = drivers.SQLite
     else:
         print "Only drivers 'Firebird', 'MySQL' and 'SQLite' are supported!"
@@ -177,7 +186,7 @@ if __name__ == '__main__':
         elif arg == 'history':
             history = True
 
-    if not(versions_path or dsn or user or current_version):
+    if not versions_path or not driver_type:
         print_help()
         sys.exit(1)
 
