@@ -79,8 +79,8 @@ class Update(Command):
         self.set_set(set)
         self.set_where(where)
 
-    def set_set(self, where):
-        pass
+    def set_set(self, set):
+        self.set = set
 
     def set_where(self, where):
         self.where = where

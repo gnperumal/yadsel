@@ -121,7 +121,7 @@ class GenericClauseParser(object):
     def parse_expression(self):
         value1 = self.object.value1
         oper = parseutils.translate_operation(self.object.operation)
-        value2 = "\"" + self.object.value2 + "\""
+        value2 = "'%s'" % self.object.value2
 
         return " %s %s %s " %( value1, oper, value2 )
 
@@ -141,6 +141,20 @@ class GenericClauseParser(object):
 
     def for_delete(self):
         return self.for_parser()
+
+class GenericSetParser(object):
+    set = None
+
+    def __init__(self, set):
+        self.set = set
+
+    def for_update(self):
+        ret = []
+
+        for field_name in self.set.values:
+            ret.append("%s = '%s'" %( field_name, self.set.values[field_name] ) )
+
+        return ','.join(ret)
 
 
 class GenericHistoryControl(object):
@@ -296,8 +310,9 @@ class GenericDriver(Driver):
     class ActionParser(GenericActionParser): pass
     class ValueParser(GenericValueParser): pass
     class ClauseParser(GenericClauseParser): pass
-    class HistoryControl(GenericHistoryControl): pass
     class ConstraintParser(GenericConstraintParser): pass
+    class SetParser(GenericSetParser): pass
+    class HistoryControl(GenericHistoryControl): pass
 
     def __init__(self, connection=None):
         super(GenericDriver, self).__init__(connection)
@@ -372,6 +387,20 @@ class GenericDriver(Driver):
                 elif type(item) == DictType:
                     values = ''.join([self.ValueParser(k, item[k]).for_insert()+", " for k in item])[:-2]
                 ret += ['%s VALUES ( %s )' %( ins, values )]
+
+        return ret
+
+    def generate_script_for_update(self, obj):
+        # Set
+        set = self.SetParser(obj.set).for_update()
+
+        # Where
+        if obj.where:
+            where = " WHERE " + self.ClauseParser(obj.where).for_update()
+        else:
+            where = ""
+
+        ret = 'UPDATE %s SET %s %s' %( obj.table_name, set, where )
 
         return ret
         
