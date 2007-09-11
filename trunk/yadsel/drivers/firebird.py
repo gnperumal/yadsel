@@ -147,6 +147,63 @@ class FirebirdFieldParser(object):
         self.field = obj
         self.additional_scripts = []
 
+    def __get_fieldtype(self, fcls, field):
+        """Returns a DDL string for definition of the field type and its format for create and alter commands"""
+        ret = ''
+
+        if fcls == Varchar:
+            ret += " VARCHAR(%d) " % field.length
+        elif fcls == Char:
+            ret += " CHAR(%d) " % field.length
+        elif fcls == Boolean:
+            ret += " TINYINT "
+        elif fcls == Decimal or fcls == Numeric:
+            ret += " DECIMAL(%d,%d) " % ( field.length, field.digits )
+        elif fcls == Text:
+            if hasattr(field, 'segment_size'):
+                segment_size = field.segment_size or 4096
+            else:
+                segment_size = 4096
+            
+            ret += " BLOB SUB_TYPE 2 SEGMENT SIZE %d " % segment_size
+        elif fcls == Blob:
+            if hasattr(field, 'segment_size'):
+                segment_size = field.segment_size or 4096
+            else:
+                segment_size = 4096
+            
+            ret += " BLOB SUB_TYPE 1 SEGMENT SIZE %d " % segment_size
+        elif fcls == ForeignKey:
+            ret = " CONSTRAINT %s FOREIGN KEY ( %s ) REFERENCES %s ( %s ) " %(
+                        field.name,
+                        ''.join(["%s," % f for f in field.fields])[:-1],
+                        field.table_name,
+                        ''.join(["%s," % f for f in field.foreign_fields])[:-1],
+                        )
+        else:
+            ret += " %s " % fcls.__name__.upper()
+
+        if issubclass(fcls, FieldType):
+            if not field.default is None:
+                if fcls in [Varchar, Char, Date, Time, DateTime, Timestamp, Text] and field.default.lower() not in ['current_date', 'current_time', 'current_datetime']:
+                    ret += " DEFAULT '%s' " % field.default
+                else:
+                    ret += " DEFAULT %s " % field.default
+
+            if field.required:
+                ret += " NOT NULL "
+
+            #if field.references and field.references.__class__ == ForeignKey:
+            #    ret += " REFERENCES '%s' ('%s') " %( field.references.table_name, field.references.field_name )
+
+            if field.primary_key:
+                sql = 'ALTER TABLE %%TABLE_NAME%% \
+                        ADD CONSTRAINT PK_%%TABLE_NAME%% \
+                        PRIMARY KEY (%s);' % field.name
+                self.additional_scripts += [sql]
+
+        return ret
+
     def for_create(self):
         fcls = self.field.__class__
 
@@ -155,61 +212,23 @@ class FirebirdFieldParser(object):
 
         ret = self.field.name
 
-        if fcls == Varchar:
-            ret += " VARCHAR(%d) " % self.field.length
-        elif fcls == Char:
-            ret += " CHAR(%d) " % self.field.length
-        elif fcls == Boolean:
-            ret += " TINYINT "
-        elif fcls == Decimal or fcls == Numeric:
-            ret += " DECIMAL(%d,%d) " % ( self.field.length, self.field.digits )
-        elif fcls == Text:
-            if hasattr(self.field, 'segment_size'):
-                segment_size = self.field.segment_size or 4096
-            else:
-                segment_size = 4096
-            
-            ret += " BLOB SUB_TYPE 2 SEGMENT SIZE %d " % segment_size
-        elif fcls == Blob:
-            if hasattr(self.field, 'segment_size'):
-                segment_size = self.field.segment_size or 4096
-            else:
-                segment_size = 4096
-            
-            ret += " BLOB SUB_TYPE 1 SEGMENT SIZE %d " % segment_size
-        elif fcls == ForeignKey:
-            ret = " CONSTRAINT %s FOREIGN KEY ( %s ) REFERENCES %s ( %s ) " %(
-                        self.field.name,
-                        ''.join(["%s," % f for f in self.field.fields])[:-1],
-                        self.field.table_name,
-                        ''.join(["%s," % f for f in self.field.foreign_fields])[:-1],
-                        )
-        else:
-            ret += " %s " % fcls.__name__.upper()
-
-        if issubclass(fcls, FieldType):
-            if not self.field.default is None:
-                if fcls in [Varchar, Char, Date, Time, DateTime, Timestamp, Text] and self.field.default.lower() not in ['current_date', 'current_time', 'current_datetime']:
-                    ret += " DEFAULT '%s' " % self.field.default
-                else:
-                    ret += " DEFAULT %s " % self.field.default
-
-            if self.field.required:
-                ret += " NOT NULL "
-
-            #if self.field.references and self.field.references.__class__ == ForeignKey:
-            #    ret += " REFERENCES '%s' ('%s') " %( self.field.references.table_name, self.field.references.field_name )
-
-            if self.field.primary_key:
-                sql = 'ALTER TABLE %%TABLE_NAME%% \
-                        ADD CONSTRAINT PK_%%TABLE_NAME%% \
-                        PRIMARY KEY (%s);' % self.field.name
-                self.additional_scripts += [sql]
+        # Get field type parsing
+        ret += self.__get_fieldtype(fcls, self.field)
 
         return ret
 
     def for_alter(self):
-        return self.for_create()
+        fcls = self.field.__class__
+
+        if not issubclass(fcls, FieldType) and not issubclass(fcls, Constraint):
+            return ""
+
+        ret = self.field.name + " TYPE "
+
+        # Get field type parsing
+        ret += self.__get_fieldtype(fcls, self.field)
+
+        return ret
 
     def for_rename(self):
         return self.for_create()
@@ -287,4 +306,8 @@ class FirebirdDriver(GenericDriver):
 
     def generate_script_for_executesql(self, obj):
         return obj.sql
+
+    def generate_script_for_dropindex(self, obj):
+        """Drops the index, as Firebird syntax: with no table name"""
+        return 'DROP INDEX %s %s' %( obj.index_name, self.terminate_delimiter )
 
