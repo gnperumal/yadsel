@@ -309,5 +309,5 @@ class FirebirdDriver(GenericDriver):
 
     def generate_script_for_dropindex(self, obj):
         """Drops the index, as Firebird syntax: with no table name"""
-        return 'DROP INDEX %s %s' %( obj.index_name, self.terminate_delimiter )
+        return 'ALTER TABLE %s DROP CONSTRAINT %s %s' %( obj.table_name, obj.index_name, self.terminate_delimiter )
 
