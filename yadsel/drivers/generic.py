@@ -87,7 +87,7 @@ class GenericActionParser(object):
 
     def for_alter(self):
         acls = self.action.__class__
-        ocls = self.action.object.__class__
+        #ocls = self.action.object.__class__
 
         if acls == Add:
             return "ADD " + self.FieldParser(self.action.object).for_alter()
