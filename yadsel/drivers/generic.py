@@ -94,7 +94,7 @@ class GenericActionParser(object):
         elif acls == AlterColumn:
             return "ALTER COLUMN %s" % self.FieldParser(self.action.object).for_alter()
         elif acls == DropColumn:
-            return "DROP COLUMN %s" % self.action.name
+            return "DROP %s" % self.action.name
         elif acls == RenameColumn:
             return "CHANGE COLUMN %s %s" %( self.action.name, self.FieldParser(self.action.object).for_rename() )
 
