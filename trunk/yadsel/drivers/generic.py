@@ -115,8 +115,12 @@ class GenericClauseParser(object):
         self.object = obj
 
     def parse_clause(self):
+        ret = []
+
         for c in self.object.clauses:
-            return self.__class__(c).for_parser()
+            ret.append(self.__class__(c).for_parser())
+
+        return 'and'.join(ret) # Todo: write "OR", "NOT", "AND", "WHERE" especific parsing
 
     def parse_expression(self):
         value1 = self.object.value1

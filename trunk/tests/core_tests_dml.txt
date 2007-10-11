@@ -1,0 +1,33 @@
+The ``core`` module
+===================
+
+Using ``dml``
+
+This is a text file with tests about parseutils module.
+
+    >>> from yadsel.core import *
+
+------------------------------------------
+
+Translate operation:
+
+    >>> exp = Expression(1, 'gt', 2)
+    >>> exp.value1, exp.operation, exp.value2
+    (1, 'gt', 2)
+
+    >>> upd = Update('USUARIOS_REGRAS', Set(status='Q'), Where(status='A', qtd_minutos__gt=0,) )
+
+    >>> upd.table_name
+    'USUARIOS_REGRAS'
+
+    >>> upd.set.values
+    {'status': 'Q'}
+
+    >>> c0 = upd.where.clauses[0]
+    >>> c0.value1, c0.operation, c0.value2
+    ('status', '=', 'A')
+
+    >>> c1 = upd.where.clauses[1]
+    >>> c1.value1, c1.operation, c1.value2
+    ('qtd_minutos', 'gt', 0)
+

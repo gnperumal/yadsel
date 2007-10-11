@@ -1,0 +1,24 @@
+The ``core`` module
+===================
+
+Using ``firebird``
+
+This is a text file with tests about Firebird driver.
+
+    >>> from yadsel.core import *
+    >>> from yadsel.drivers import Firebird
+
+------------------------------------------
+
+Translate operation:
+
+    >>> upd = Update('USUARIOS_REGRAS', Set(status='Q'), Where(status='A', qtd_minutos__gt=0,) )
+    >>> driver = Firebird()
+
+    >>> driver.generate_script_for_update(upd)
+    "UPDATE USUARIOS_REGRAS SET status = 'Q'  WHERE  status = 'A' and qtd_minutos > '0' "
+
+    >>> parser = Firebird.ClauseParser(upd.where)
+
+    >>> parser.for_update()
+    " status = 'A' and qtd_minutos > '0' "
