@@ -399,12 +399,17 @@ class GenericDriver(Driver):
         set = self.SetParser(obj.set).for_update()
 
         # Where
-        if obj.where:
-            where = " WHERE " + self.ClauseParser(obj.where).for_update()
-        else:
-            where = ""
+        where = obj.where and " WHERE " + self.ClauseParser(obj.where).for_update() or ""
 
         ret = 'UPDATE %s SET %s %s' %( obj.table_name, set, where )
+
+        return ret
+
+    def generate_script_for_delete(self, obj):
+        # Where
+        where = obj.where and " WHERE " + self.ClauseParser(obj.where).for_delete() or ""
+
+        ret = 'DELETE FROM %s %s' %( obj.table_name, where )
 
         return ret
         

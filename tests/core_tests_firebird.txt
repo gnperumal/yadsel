@@ -12,8 +12,8 @@ This is a text file with tests about Firebird driver.
 
 Translate operation:
 
-    >>> upd = Update('USUARIOS_REGRAS', Set(status='Q'), Where(status='A', qtd_minutos__gt=0,) )
     >>> driver = Firebird()
+    >>> upd = Update('USUARIOS_REGRAS', Set(status='Q'), Where(status='A', qtd_minutos__gt=0,) )
 
     >>> driver.generate_script_for_update(upd)
     "UPDATE USUARIOS_REGRAS SET status = 'Q'  WHERE  status = 'A' and qtd_minutos > '0' "
@@ -22,3 +22,9 @@ Translate operation:
 
     >>> parser.for_update()
     " status = 'A' and qtd_minutos > '0' "
+
+    >>> de = Delete('USUARIOS_REGRAS', Where(status='A', qtd_minutos__gt=0,) )
+
+    >>> driver.generate_script_for_delete(de)
+    "DELETE FROM USUARIOS_REGRAS  WHERE  status = 'A' and qtd_minutos > '0' "
+
