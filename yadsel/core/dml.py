@@ -22,17 +22,20 @@ class Clause(object):
     clauses = []
     
     def __init__(self, *args, **kwargs):
-        self.clauses = [c for c in args if issubclass(c.__class__)]
+        self.clauses = [c for c in args if issubclass(c.__class__, Expression) or issubclass(c.__class__, Clause)]
 
-        for k in kwargs:
-            if k.count(OPERATION_DELIMITER):
-                value1, oper = k.split(OPERATION_DELIMITER)
+        for k, v in kwargs.items():
+            if issubclass(v.__class__, Clause):
+                self.clauses.append(v)
             else:
-                value1, oper = k, '='
+                if k.count(OPERATION_DELIMITER):
+                    value1, oper = k.split(OPERATION_DELIMITER)
+                else:
+                    value1, oper = k, '='
                 
-            value2 = kwargs[k]
+                value2 = v #kwargs[k]
             
-            self.clauses.append(Expression(value1, oper, value2))
+                self.clauses.append(Expression(value1, oper, value2))
 
 class Not(Clause): pass
 
