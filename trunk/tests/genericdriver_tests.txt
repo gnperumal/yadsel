@@ -1,0 +1,58 @@
+The ``drivers`` module
+===================
+
+Using ``GenericDriver``
+
+This is a text file with tests about parseutils module.
+
+    >>> from yadsel.drivers import Generic
+    >>> from yadsel.core import Integer, Varchar, Where, Or, And, Not
+
+    >>> driver = Generic()
+   
+------------------------------------------
+
+Clauses:
+
+AND (without And object)
+
+    >>> where = Where(status='A', type='B')
+    >>> parser = driver.ClauseParser(where)
+    >>> parser.for_parser()
+    "status = 'A' and type = 'B'"
+
+AND
+
+    >>> where = Where(And(status='A', type='B'))
+    >>> parser = driver.ClauseParser(where)
+    >>> parser.for_parser()
+    "(status = 'A' and type = 'B')"
+
+OR
+
+    >>> where = Where(Or(status='A', type='B'))
+    >>> parser = driver.ClauseParser(where)
+    >>> parser.for_parser()
+    "(status = 'A' or type = 'B')"
+
+NOT
+
+    >>> where = Where(Not(status='A'))
+    >>> parser = driver.ClauseParser(where)
+    >>> parser.for_parser()
+    "not (status = 'A')"
+
+NOT/AND
+
+    >>> where = Where(Not(status='A', type='B'))
+    >>> parser = driver.ClauseParser(where)
+    >>> parser.for_parser()
+    "not (status = 'A' and type = 'B')"
+
+Complex
+
+    >>> where = Where(Or(status='A', type='B'), Not(value__lt=0), value=15.9)
+    >>> parser = driver.ClauseParser(where)
+    >>> parser.for_parser()
+    "(status = 'A' or type = 'B') and not (value < '0') and value = '15.9'"
+

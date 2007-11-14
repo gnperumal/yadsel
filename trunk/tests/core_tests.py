@@ -56,5 +56,6 @@ if __name__ == '__main__':
     doctest.testfile('core_tests_zipfile_versions.txt')
     doctest.testfile('core_tests_parseutils.txt')
     doctest.testfile('core_tests_dml.txt')
-    doctest.testfile('core_tests_firebird.txt')
+    doctest.testfile('firebird_tests.txt')
+    doctest.testfile('genericdriver_tests.txt')
 

@@ -6,7 +6,7 @@ Using ``parseutils``
 This is a text file with tests about parseutils module.
 
     >>> from yadsel.core import parseutils
-    >>> from yadsel.core import Integer, Varchar
+    >>> from yadsel.core import Integer, Varchar, Where, Or, And, Not
 
 ------------------------------------------
 
@@ -33,4 +33,5 @@ Find field:
     >>> parseutils.find_field(fields_list, 'id').name
     'id'
     >>> parseutils.find_field(fields_list, 'username')
-    
+   
+

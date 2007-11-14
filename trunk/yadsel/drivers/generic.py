@@ -120,14 +120,23 @@ class GenericClauseParser(object):
         for c in self.object.clauses:
             ret.append(self.__class__(c).for_parser())
 
-        return 'and'.join(ret) # Todo: write "OR", "NOT", "AND", "WHERE" especific parsing
+        if self.object.__class__ == Or:
+            ret = '(%s)' % ' or '.join(ret)
+        elif self.object.__class__ == Not:
+            ret = 'not (%s)' % ' and '.join(ret)
+        elif self.object.__class__ == And:
+            ret = '(%s)' % ' and '.join(ret)
+        else:
+            ret = ' and '.join(ret)
+
+        return ret.strip()
 
     def parse_expression(self):
         value1 = self.object.value1
         oper = parseutils.translate_operation(self.object.operation)
         value2 = "'%s'" % self.object.value2
 
-        return " %s %s %s " %( value1, oper, value2 )
+        return "%s %s %s" %( value1, oper, value2 )
 
     def for_parser(self):
         if issubclass(self.object.__class__, Clause):
