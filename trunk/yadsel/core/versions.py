@@ -124,7 +124,7 @@ class Controller(object):
         try:
             self.driver.execute_command(command)
         except Exception, e:
-            print "When executing the following SQL command: '%s', following error ocurred: '%s'" %( command, e )
+            raise Exception("When executing the following SQL command: '%s', following error ocurred: '%s'" %( command, e ))
 
     def __execute_script(self, script, versions_sequence):
         # Loop by sequence of versions
@@ -139,8 +139,6 @@ class Controller(object):
             self.register_version_history(self.current_version)
 
     def upgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False):
-        step = step or 0
-
         if not cacheable or force:
             # Get the generated script
             self.cache['script'] = self.script_for_upgrade()
@@ -149,7 +147,10 @@ class Controller(object):
             self.cache['versions_list'] = self.cache['script'].keys()
 
             # Sort version numbers for upgrading
-            self.cache['versions_list'].sort()
+            self.cache['versions_list'].sort(lambda a, b: int(a) - int(b))
+
+            # Slices the versions list between current and to args
+            self.cache['versions_list'] = [v for v in self.cache['versions_list'] if (not current or int(v) > current) and (not to or int(v) <= to)]
 
             # Set steps count
             self.cache['steps_count'] = len(self.cache['versions_list'])
@@ -158,7 +159,7 @@ class Controller(object):
         if not self.cache['versions_list']:
             return False
 
-        versions_list = step is not None and self.cache['versions_list'] or self.cache['versions_list'][step]
+        versions_list = step is None and self.cache['versions_list'] or [self.cache['versions_list'][step]]
 
         # Call the execution for script
         if not test:

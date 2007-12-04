@@ -111,10 +111,10 @@ def do(versions_path, driver_type, dsn, user, passwd, action,
                 for cmd in script[v]:
                     print "", cmd
         elif mode == MODE_HIDDEN:
-            controller.upgrade(test=test)
+            controller.upgrade(current=current_version, to=new_version, test=test)
         elif mode == MODE_STEPS:
             # First step for build scripts for cache and gets steps count
-            controller.upgrade(cacheable=True, force=True, step=0, test=test)
+            controller.upgrade(current=current_version, to=new_version, cacheable=True, force=True, step=0, test=test)
             print 'Step %d of %d: ""' %( 1, controller.cache['steps_count'] )
 
             # Loop for next steps (if exists)
@@ -123,7 +123,7 @@ def do(versions_path, driver_type, dsn, user, passwd, action,
                     controller.upgrade(cacheable=True, step=i, test=test)
                     print 'Step %d of %d: "%s"' %( i+1, controller.cache['steps_count'], "" )
         else:
-            controller.upgrade(test=test)
+            controller.upgrade(current=current_version, to=new_version, test=test)
             
     elif action == core.ACTION_DOWN:
         print_if( mode != MODE_HIDDEN, "Downgrading..." )
