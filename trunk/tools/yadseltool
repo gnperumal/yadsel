@@ -187,7 +187,7 @@ if __name__ == '__main__':
         elif arg == 'history':
             history = True
         elif arg == 'silent':
-            silent = False
+            silent = True
 
     if not versions_path or not driver_type:
         print_help()
