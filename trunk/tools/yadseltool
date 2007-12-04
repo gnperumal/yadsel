@@ -35,6 +35,7 @@ def print_help():
             "  mode=[%s]\n\toptional. Default: %s\n" %( ''.join([m+'|' for m in AVAILABLE_MODES])[:-1], MODE_HIDDEN ),
             "  test\n\toptional. Turns off persistent changings on database\n",
             "  history\n\toptional. Turns on history control on database",
+            "  silent\n\toptional. Only shows error messages without stop upgrade/downgrade process",
            ]
 
     print ''.join([l+"\n" for l in temp])
@@ -43,7 +44,7 @@ def print_if( condition, s ):
     if condition: print s
 
 def do(versions_path, driver_type, dsn, user, passwd, action, 
-       current_version, new_version, mode, test, history):
+       current_version, new_version, mode, test, history, silent):
     connection = None
 
     if driver_type == "firebird":
@@ -111,19 +112,19 @@ def do(versions_path, driver_type, dsn, user, passwd, action,
                 for cmd in script[v]:
                     print "", cmd
         elif mode == MODE_HIDDEN:
-            controller.upgrade(current=current_version, to=new_version, test=test)
+            controller.upgrade(current=current_version, to=new_version, test=test, silent=silent)
         elif mode == MODE_STEPS:
             # First step for build scripts for cache and gets steps count
-            controller.upgrade(current=current_version, to=new_version, cacheable=True, force=True, step=0, test=test)
+            controller.upgrade(current=current_version, to=new_version, cacheable=True, force=True, step=0, test=test, silent=silent)
             print 'Step %d of %d: ""' %( 1, controller.cache['steps_count'] )
 
             # Loop for next steps (if exists)
             if controller.cache['steps_count'] > 1:
                 for i in range(1, controller.cache['steps_count']):
-                    controller.upgrade(cacheable=True, step=i, test=test)
+                    controller.upgrade(cacheable=True, step=i, test=test, silent=silent)
                     print 'Step %d of %d: "%s"' %( i+1, controller.cache['steps_count'], "" )
         else:
-            controller.upgrade(current=current_version, to=new_version, test=test)
+            controller.upgrade(current=current_version, to=new_version, test=test, silent=silent)
             
     elif action == core.ACTION_DOWN:
         print_if( mode != MODE_HIDDEN, "Downgrading..." )
@@ -160,7 +161,7 @@ if __name__ == '__main__':
     new_version = 0
     passwd = ''
     mode = MODE_HIDDEN
-    test = history = False
+    silent = test = history = False
 
     for arg in sys.argv:
         if arg.startswith('path='):
@@ -185,6 +186,8 @@ if __name__ == '__main__':
             test = True
         elif arg == 'history':
             history = True
+        elif arg == 'silent':
+            silent = False
 
     if not versions_path or not driver_type:
         print_help()
@@ -202,5 +205,6 @@ if __name__ == '__main__':
        mode=mode,
        test=test,
        history=history,
+       silent=silent,
        )
 
