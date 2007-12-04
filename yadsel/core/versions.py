@@ -126,7 +126,7 @@ class Controller(object):
             self.driver.execute_command(command)
         except Exception, e:
             msg = "When executing the following SQL command: '%s', following error ocurred: '%s'" %( command, e )
-            
+
             if self.silent:
                 print msg
             else:
