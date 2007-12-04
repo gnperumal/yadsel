@@ -55,12 +55,15 @@ class CreateTable(Command):
 
 class AlterTable(Command):
     table_name = None
-    actions = []
-    fields = []
-    constraints = []
+    actions = None
+    fields = None
+    constraints = None
 
     def __init__(self, table_name, *args, **kwargs):
         self.table_name = table_name
+        self.actions = []
+        self.fields = []
+        self.constraints = []
 
         # Parses no named args
         for k in args:
