@@ -19,6 +19,7 @@ class Controller(object):
     current_version = 0
     version_classes = []
     cache = {}
+    silent = False
 
     def __init__(self, driver, connection=None, current_version=None):
         self.connection = connection
@@ -124,7 +125,12 @@ class Controller(object):
         try:
             self.driver.execute_command(command)
         except Exception, e:
-            raise Exception("When executing the following SQL command: '%s', following error ocurred: '%s'" %( command, e ))
+            msg = "When executing the following SQL command: '%s', following error ocurred: '%s'" %( command, e )
+            
+            if self.silent:
+                print msg
+            else:
+                raise Exception(msg)
 
     def __execute_script(self, script, versions_sequence):
         # Loop by sequence of versions
@@ -138,7 +144,9 @@ class Controller(object):
             self.current_version = v
             self.register_version_history(self.current_version)
 
-    def upgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False):
+    def upgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False, silent=False):
+        self.silent = silent
+
         if not cacheable or force:
             # Get the generated script
             self.cache['script'] = self.script_for_upgrade()
@@ -165,7 +173,7 @@ class Controller(object):
         if not test:
             self.__execute_script(self.cache['script'], versions_list)
 
-    def downgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False):
+    def downgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False, silent=False):
         if not cacheable or force:
             # Get the generated script
             self.cache['script'] = self.script_for_downgrade()
