@@ -7,7 +7,7 @@
 import re
 
 from yadsel.core import *
-from generic import GenericDriver, GenericHistoryControl
+from generic import GenericDriver, GenericHistoryControl, GenericLogControl
 
 class FirebirdInspector(SchemaInspector):
     def get_tables_list(self):
@@ -277,11 +277,22 @@ class FirebirdHistoryControl(GenericHistoryControl):
         );
     """
 
+class FirebirdLogControl(GenericLogControl):
+    sql_createtable = """
+        CREATE TABLE %(t)s (
+            id INTEGER NOT NULL,
+            version_number INTEGER NOT NULL,
+            log_date TIMESTAMP NOT NULL,
+            msg VARCHAR(8000)
+        );
+    """
+
 class FirebirdDriver(GenericDriver):
     class Inspector(FirebirdInspector): pass
     class FieldParser(FirebirdFieldParser): pass
     class ConstraintParser(FirebirdConstraintParser): pass
     class HistoryControl(FirebirdHistoryControl): pass
+    class LogControl(FirebirdLogControl): pass
 
     def __init__(self, connection=None):
         super(FirebirdDriver, self).__init__(connection)
