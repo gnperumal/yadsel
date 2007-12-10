@@ -19,7 +19,7 @@ class Controller(object):
     current_version = 0
     version_classes = []
     cache = {}
-    silent = False
+    log = silent = False
 
     def __init__(self, driver, connection=None, current_version=None):
         self.connection = connection
@@ -127,6 +127,10 @@ class Controller(object):
         except Exception, e:
             msg = "When executing the following SQL command: '%s', following error ocurred: '%s'" %( command, e )
 
+            # Log exception message
+            if self.log:
+                self.register_log(self.current_version, e)
+
             if self.silent:
                 print msg
             else:
@@ -135,17 +139,27 @@ class Controller(object):
     def __execute_script(self, script, versions_sequence):
         # Loop by sequence of versions
         for v in versions_sequence:
+            # Log version started
+            self.register_log(self.current_version, 'Version process started...')
+
             # Loop by commands
             for cmd in script[v]:
+                # Log before execution
+                self.register_log(self.current_version, cmd)
+
                 # Execute the single command each by time
                 self.__execute_command(cmd)
+
+            # Log version finished
+            self.register_log(self.current_version, 'Version process finished...')
 
             # Register version
             self.current_version = v
             self.register_version_history(self.current_version)
 
-    def upgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False, silent=False):
+    def upgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False, silent=False, log=False):
         self.silent = silent
+        self.log = log
 
         if not cacheable or force:
             # Get the generated script
@@ -219,6 +233,18 @@ class Controller(object):
 
         # Register new version to history control
         return history.register_version(version_number)
+
+    def register_log(self, version_number, msg):
+        if not self.connection: return False
+
+        # Instantiates log control
+        log = self.driver.LogControl(self.connection)
+
+        # Tries to prepare database for this (if not yet)
+        log.prepare_database_elements()
+
+        # Register new version to log control
+        return log.register_log(version_number, msg)
 
 
 class ExtensibleVersion(object):

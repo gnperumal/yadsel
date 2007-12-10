@@ -245,7 +245,7 @@ class GenericHistoryControl(object):
             cur.execute(sql)
             self.connection.commit()
 
-            cur.execute('select * from yadsel_version')
+            cur.execute('select * from %s' % self.table_name)
         except Exception, e:
             # Return 'False' if some error occurred
             return False
@@ -277,6 +277,99 @@ class GenericHistoryControl(object):
             return None
 
         return ret
+
+
+class GenericLogControl(object):
+    connection = None
+    table_name = 'yadsel_log'
+
+    sql_createtable = """
+        CREATE TABLE %(t)s (
+            id INTEGER NOT NULL,
+            version_number INTEGER NOT NULL,
+            log_date DATETIME NOT NULL,
+            msg TEXT
+        );
+    """
+
+    sql_createpk = """
+        ALTER TABLE %(t)s 
+            ADD CONSTRAINT pk_%(t)s
+            PRIMARY KEY ( id );
+    """
+
+    sql_droptable = """
+        DROP TABLE %s;
+    """
+
+    sql_registerlog = """
+        INSERT INTO %(t)s
+         (id, version_number, log_date, msg)
+        VALUES
+         ((select case when max(id) is null then 0 else max(id) end + 1 
+           from %(t)s), '%(v)s', '%(d)s', '%(m)s')
+    """
+
+    def __init__(self, connection):
+        self.connection = connection or self.connection
+
+    def prepare_database_elements(self):
+        sql1 = self.sql_createtable %{ 't': self.table_name }
+        sql2 = self.sql_createpk %{ 't': self.table_name }
+
+        cur = self.connection.cursor()
+
+        try:
+            cur.execute(sql1)
+            self.connection.commit()
+            
+            cur.execute(sql2)
+            self.connection.commit()
+        except Exception, e:
+            # Return 'False' if some error did (like "table already exists")
+            return False
+        
+        return True
+
+    def clear_database_elements(self):
+        sql = self.sql_droptable %( self.table_name )
+
+        cur = self.connection.cursor()
+
+        try:
+            res = cur.execute(sql)
+            self.connection.commit()
+        except:
+            # Return 'False' if some error occurred
+            return False
+
+        return True
+
+    def register_log(self, version_number, msg, log_date=None):
+        # Determines date/time of version change by default (now)
+        log_date = log_date or datetime.now()
+
+        sql = self.sql_registerlog %{ 
+                't': self.table_name,
+                'v': version_number,
+                'd': log_date.isoformat(' ')[:19],
+                'm': msg,
+                }
+
+        cur = self.connection.cursor()
+
+        try:
+            cur.execute(sql)
+            self.connection.commit()
+
+            cur.execute('select * from %s' % self.table_name)
+        except Exception, e:
+            #print sql, "\n\n"
+            #raise e
+            # Return 'False' if some error occurred
+            return False
+
+        return True
 
 
 class GenericConstraintParser(object):
@@ -326,6 +419,7 @@ class GenericDriver(Driver):
     class ConstraintParser(GenericConstraintParser): pass
     class SetParser(GenericSetParser): pass
     class HistoryControl(GenericHistoryControl): pass
+    class LogControl(GenericLogControl): pass
 
     def __init__(self, connection=None):
         super(GenericDriver, self).__init__(connection)
