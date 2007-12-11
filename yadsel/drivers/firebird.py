@@ -283,7 +283,7 @@ class FirebirdLogControl(GenericLogControl):
             id INTEGER NOT NULL,
             version_number INTEGER NOT NULL,
             log_date TIMESTAMP NOT NULL,
-            msg VARCHAR(8000)
+            msg BLOB SUB_TYPE TEXT
         );
     """
 
