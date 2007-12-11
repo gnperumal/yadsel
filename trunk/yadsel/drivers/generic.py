@@ -177,7 +177,8 @@ class GenericHistoryControl(object):
     sql_createtable = """
         CREATE TABLE %(t)s (
             version_number INTEGER NOT NULL,
-            change_date DATETIME NOT NULL
+            change_date DATETIME NOT NULL,
+            result_type CHAR(1)
         );
     """
 
@@ -196,6 +197,10 @@ class GenericHistoryControl(object):
          (version_number, change_date)
         VALUES
         ('%s', '%s')
+    """
+
+    sql_createresulttype = """
+        ALTER TABLE %(t)s ADD result_type CHAR(1);
     """
 
     def __init__(self, connection):
@@ -349,6 +354,9 @@ class GenericLogControl(object):
         # Determines date/time of version change by default (now)
         log_date = log_date or datetime.now()
 
+        # Remove invalid tokens
+        msg = msg.replace('"', "__").replace("'", "__")
+
         sql = self.sql_registerlog %{ 
                 't': self.table_name,
                 'v': version_number,
@@ -361,11 +369,9 @@ class GenericLogControl(object):
         try:
             cur.execute(sql)
             self.connection.commit()
-
-            cur.execute('select * from %s' % self.table_name)
         except Exception, e:
             #print sql, "\n\n"
-            #raise e
+            raise e
             # Return 'False' if some error occurred
             return False
 

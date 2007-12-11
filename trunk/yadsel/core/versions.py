@@ -121,15 +121,20 @@ class Controller(object):
 
         return pk_list + fk_list + others
 
-    def __execute_command(self, command):
+    def __execute_command(self, command, version_number=None):
+        version_number = version_number or self.current_version
+
         try:
+            # Log before execution
+            self.register_log(command, version_number=version_number)
+
             self.driver.execute_command(command)
         except Exception, e:
             msg = "When executing the following SQL command: '%s', following error ocurred: '%s'" %( command, e )
 
             # Log exception message
             if self.log:
-                self.register_log(self.current_version, e)
+                self.register_log(e, version_number=version_number)
 
             if self.silent:
                 print msg
@@ -140,18 +145,15 @@ class Controller(object):
         # Loop by sequence of versions
         for v in versions_sequence:
             # Log version started
-            self.register_log(self.current_version, 'Version process started...')
+            self.register_log('Version process started...', version_number=v)
 
             # Loop by commands
             for cmd in script[v]:
-                # Log before execution
-                self.register_log(self.current_version, cmd)
-
                 # Execute the single command each by time
-                self.__execute_command(cmd)
+                self.__execute_command(cmd, version_number=v)
 
             # Log version finished
-            self.register_log(self.current_version, 'Version process finished...')
+            self.register_log('Version process finished...', version_number=v)
 
             # Register version
             self.current_version = v
@@ -234,8 +236,10 @@ class Controller(object):
         # Register new version to history control
         return history.register_version(version_number)
 
-    def register_log(self, version_number, msg):
+    def register_log(self, msg, version_number=None):
         if not self.connection: return False
+
+        version_number = version_number or self.current_version
 
         # Instantiates log control
         log = self.driver.LogControl(self.connection)
