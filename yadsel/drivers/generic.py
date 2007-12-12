@@ -178,7 +178,7 @@ class GenericHistoryControl(object):
         CREATE TABLE %(t)s (
             version_number INTEGER NOT NULL,
             change_date DATETIME NOT NULL,
-            result_type CHAR(1)
+            errors INTEGER DEFAULT 0
         );
     """
 
@@ -194,13 +194,14 @@ class GenericHistoryControl(object):
 
     sql_registerversion = """
         INSERT INTO %s
-         (version_number, change_date)
+         (version_number, change_date, errors)
         VALUES
-        ('%s', '%s')
+        ('%s', '%s', %d)
     """
 
-    sql_createresulttype = """
-        ALTER TABLE %(t)s ADD result_type CHAR(1);
+    # 'O': Finished OK, 'E': Finished with Errors
+    sql_createerrorsfield = """
+        ALTER TABLE %(t)s ADD errors INTEGER DEFAULT 0;
     """
 
     def __init__(self, connection):
@@ -238,22 +239,34 @@ class GenericHistoryControl(object):
 
         return True
 
-    def register_version(self, version_number, change_date=None):
+    def register_version(self, version_number, change_date=None, errors=0):
         # Determines date/time of version change by default (now)
         change_date = change_date or datetime.now()
 
-        sql = self.sql_registerversion %( self.table_name, version_number, change_date.isoformat(' ')[:19] )
+        sql = self.sql_registerversion %( self.table_name, version_number, change_date.isoformat(' ')[:19], errors )
 
         cur = self.connection.cursor()
 
-        try:
+        def execute(sql):
             cur.execute(sql)
             self.connection.commit()
 
-            cur.execute('select * from %s' % self.table_name)
+            #cur.execute('select * from %s' % self.table_name)
+
+        try:
+            execute(sql)
         except Exception, e:
-            # Return 'False' if some error occurred
-            return False
+            if e.__class__.__name__ == 'ProgrammingError':
+                try:
+                    # Creates the errors field if does not exists
+                    execute(self.sql_createerrorsfield %{'t': self.table_name})
+
+                    # Try again...
+                    execute(sql)
+                except:
+                    return False
+            else:
+                return False
 
         return True
 

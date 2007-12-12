@@ -20,6 +20,7 @@ class Controller(object):
     version_classes = []
     cache = {}
     log = silent = False
+    __version_errors = 0
 
     def __init__(self, driver, connection=None, current_version=None):
         self.connection = connection
@@ -130,6 +131,8 @@ class Controller(object):
 
             self.driver.execute_command(command)
         except Exception, e:
+            self.__version_errors += 1
+
             msg = "When executing the following SQL command: '%s', following error ocurred: '%s'" %( command, e )
 
             # Log exception message
@@ -144,6 +147,8 @@ class Controller(object):
     def __execute_script(self, script, versions_sequence):
         # Loop by sequence of versions
         for v in versions_sequence:
+            self.__version_errors = 0
+
             # Log version started
             self.register_log('Version process started...', version_number=v)
 
@@ -157,7 +162,7 @@ class Controller(object):
 
             # Register version
             self.current_version = v
-            self.register_version_history(self.current_version)
+            self.register_version_history(self.current_version, errors=self.__version_errors)
 
     def upgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False, silent=False, log=False):
         self.silent = silent
@@ -224,7 +229,7 @@ class Controller(object):
         # Set current version by latest version number
         self.current_version = latest_version and latest_version['version_number'] or 0
 
-    def register_version_history(self, version_number):
+    def register_version_history(self, version_number, errors=0):
         if not self.connection: return False
 
         # Instantiates history control
@@ -234,7 +239,7 @@ class Controller(object):
         history.prepare_database_elements()
 
         # Register new version to history control
-        return history.register_version(version_number)
+        return history.register_version(version_number, errors=errors)
 
     def register_log(self, msg, version_number=None):
         if not self.connection: return False
