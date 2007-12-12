@@ -19,3 +19,4 @@
   * [DriversPackage Drivers Package]
   * [HowToInterfaceWithADelphiApplication How to Interface with a Delphi Application]
   * [HowToInterfaceWithADjangoApplication How to Interface with a Django Application]
+  * [Dependences]
