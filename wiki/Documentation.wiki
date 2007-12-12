@@ -1,9 +1,9 @@
-#summary Here you will found detailed documentation, tutorials and examples to use Yadsel and its tools.
-#labels Phase-Support
+#summary Here you will found detailed documentation, tutorials and examples to use Yadsel ]and its tools.
+#labels Phase-Support,Featured
 
 = Tutorials =
 
-coming soon
+*coming soon*
 
   * Tutorial1 - installing and creating the first database version
 
@@ -13,9 +13,9 @@ coming soon
 
 = Reference Guid =
 
-coming soon
+*coming soon*
 
   * [CorePackage Core Package]
-  * DriversPackage
-  * HowToInterfaceWithADelphiApplication
-  * HowToInterfaceWithADjangoApplication
+  * [DriversPackage Drivers Package]
+  * [HowToInterfaceWithADelphiApplication How to Interface with a Delphi Application]
+  * [HowToInterfaceWithADjangoApplication How to Interface with a Django Application]
