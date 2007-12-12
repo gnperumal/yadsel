@@ -15,7 +15,7 @@ coming soon
 
 coming soon
 
-  * [CorePackage|Core Package]
+  * [CorePackage Core Package]
   * DriversPackage
   * HowToInterfaceWithADelphiApplication
   * HowToInterfaceWithADjangoApplication
