@@ -1,5 +1,5 @@
 #summary This page shows some examples of version control classes for migrations.
-#labels Featured,Phase-Support
+#labels Phase-Support
 
 = Example 1 =
 
