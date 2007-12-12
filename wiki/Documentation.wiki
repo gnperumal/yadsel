@@ -9,13 +9,13 @@ coming soon
 
 = Examples =
 
-  * Examples
+  * [Examples]
 
 = Reference Guid =
 
 coming soon
 
-  * CorePackage
+  * [CorePackage|Core Package]
   * DriversPackage
   * HowToInterfaceWithADelphiApplication
   * HowToInterfaceWithADjangoApplication
