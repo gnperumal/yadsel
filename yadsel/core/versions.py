@@ -136,8 +136,7 @@ class Controller(object):
             msg = "When executing the following SQL command: '%s', following error ocurred: '%s'" %( command, e )
 
             # Log exception message
-            if self.log:
-                self.register_log(e, version_number=version_number)
+            self.register_log(e, version_number=version_number)
 
             if self.silent:
                 print msg
@@ -242,7 +241,7 @@ class Controller(object):
         return history.register_version(version_number, errors=errors)
 
     def register_log(self, msg, version_number=None):
-        if not self.connection: return False
+        if not self.connection or not self.log: return False
 
         version_number = version_number or self.current_version
 
