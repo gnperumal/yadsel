@@ -5,7 +5,7 @@
 
 *coming soon*
 
-  * Tutorial1 - installing and creating the first database version
+  * [Tutorial1] - installing and creating the first database version
 
 = Examples =
 
