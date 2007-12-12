@@ -100,6 +100,22 @@ optional
 Syntax:
 history
 
+== silent ==
+If declared, hide error messages and let the process go on.
+
+optional
+
+Syntax:
+silent
+
+== log ==
+If declared, turns on the logging system, that is saved on a table called 'yadsel_log'.
+
+optional
+
+Syntax:
+log
+
 == Dependences ==
 
 This module depends of py2exe extension *1*, for create an executable file to be packaged in Windows applications.
