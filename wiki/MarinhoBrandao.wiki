@@ -1,4 +1,8 @@
 #summary Some words about Marinho Brandão.
 #labels Phase-Implementation
 
-Weblog: [http://marinho.webdoisonline.com/blog/]
+Marinho Brandão is brazilian, lives at Goiania, GO, Brazil.
+
+Enthusiast of Python, Django and agile methodologies.
+
+Website: [http://marinho.webdoisonline.com/]
