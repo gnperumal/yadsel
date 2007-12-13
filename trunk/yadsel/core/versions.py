@@ -136,7 +136,7 @@ class Controller(object):
             msg = "When executing the following SQL command: '%s', following error ocurred: '%s'" %( command, e )
 
             # Log exception message
-            self.register_log(e, version_number=version_number)
+            self.register_log(str(e), version_number=version_number)
 
             if self.silent:
                 print msg
