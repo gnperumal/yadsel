@@ -85,6 +85,16 @@ def do(versions_path, driver_type, dsn, user, passwd, action, current_version,
             
         driver = drivers.MSSQL
     elif driver_type == "mysql":
+        try:
+            import MySQLdb
+        except:
+            print "A Python extension called 'MySQLdb' was not found!"
+            sys.exit(1)
+
+        if dsn:
+            connection = MySQLdb.connect(dsn.split('/')[0], user, passwd)
+            connection.select_db(dsn.split('/')[1])
+            
         driver = drivers.MySQL
     elif driver_type == "sqlite":
         try:
