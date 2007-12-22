@@ -104,7 +104,7 @@ class MySQLLogControl(object):
 
 class MySQLDriver(GenericDriver):
     class Inspector(MySQLInspector): pass
-    #class LogControl(MySQLLogControl): pass
+    class LogControl(MySQLLogControl): pass
 
     def __init__(self, connection=None):
         super(MySQLDriver, self).__init__(connection)
