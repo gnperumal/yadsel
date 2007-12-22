@@ -99,6 +99,7 @@ class MySQLDriver(GenericDriver):
         super(MySQLDriver, self).execute_command(command)
 
         if self.connection:
+            raise Exception('execute_command')
             cur = self.connection.cursor()
             result = cur.execute(command)
 
