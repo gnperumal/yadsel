@@ -6,8 +6,13 @@ This module provide a tool for doing migration by shell line
 @creation 2007-05-25
 """
 
-import sys
+import sys, os
 from yadsel import core, drivers
+
+try:
+    import simplejson
+except ImportError, e:
+    pass
 
 AVAILABLE_ACTIONS = ( core.ACTION_UP, core.ACTION_DOWN, )
 
@@ -16,6 +21,7 @@ MODE_STEPS = 'steps'
 MODE_INTERACTIVE = 'interactive'
 MODE_OUTPUT = 'output'
 AVAILABLE_MODES = ( MODE_HIDDEN, MODE_STEPS, MODE_INTERACTIVE, MODE_OUTPUT )
+DEFAULT_YADSEL_FILENAME = '.yadsel'
 
 def print_header():
     print "Yadsel Tool // http://code.google.com/p/yadsel/\n"
@@ -46,6 +52,14 @@ def print_if( condition, s ):
 
 def do(versions_path, driver_type, dsn, user, passwd, action, current_version, 
         new_version, mode, test, history, silent, log):
+    """Executes the upgrade or downgrade"""
+    versions_path = versions_path or '.'
+    action = action or 'up'
+
+    if not dsn:
+        print "Invalid DSN!"
+        sys.exit(1)
+
     connection = None
 
     if driver_type == "firebird":
@@ -154,6 +168,40 @@ def do(versions_path, driver_type, dsn, user, passwd, action, current_version,
         else:
             controller.downgrade(test=test)
 
+def do_from_dict(keys):
+    # Does the (up|down)grade
+    do(versions_path=keys.get('path', None),
+       driver_type=keys.get('driver', '').lower(),
+       dsn=keys.get('dsn', None),
+       action=keys.get('action', None),
+       user=keys.get('user', None),
+       passwd=keys.get('pass', None),
+       current_version=keys.get('from', None),
+       new_version=keys.get('to', None),
+       mode=keys.get('mode', None),
+       test=keys.get('test', False),
+       history=keys.get('history', False),
+       silent=keys.get('silent', False),
+       log=keys.get('log', False),
+       )
+
+def do_from_file(filename, namespace=None):
+    """Executes from a project file"""
+    fp = file(filename)
+    cont = fp.read()
+    fp.close()
+
+    json = simplejson.loads(cont)
+
+    if namespace:
+        do_from_dict(json[namespace])
+    else:
+        for keys in json.values():
+            try:
+                do_from_dict(keys)
+            except:
+                print e, "\n"
+
 if __name__ == '__main__':
     print_header()
 
@@ -163,6 +211,12 @@ if __name__ == '__main__':
     passwd = ''
     mode = MODE_HIDDEN
     log = silent = test = history = False
+
+    if len(sys.argv) == 1 or sys.argv[1].find('=') == -1:
+        if os.path.isfile(DEFAULT_YADSEL_FILENAME):
+            ns = len(sys.argv) == 2 and sys.argv[1] or None
+            do_from_file(DEFAULT_YADSEL_FILENAME, ns)
+            sys.exit(0)
 
     for arg in sys.argv:
         if arg.startswith('path='):
