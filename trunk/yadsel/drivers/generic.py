@@ -345,6 +345,7 @@ class GenericLogControl(object):
             self.connection.commit()
         except Exception, e:
             # Return 'False' if some error did (like "table already exists")
+            raise e
             return False
         
         return True
@@ -384,7 +385,6 @@ class GenericLogControl(object):
             self.connection.commit()
         except Exception, e:
             #print sql, "\n\n"
-            print sql, "\n"
             raise e
             # Return 'False' if some error occurred
             return False
