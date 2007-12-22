@@ -384,7 +384,6 @@ class GenericLogControl(object):
             self.connection.commit()
         except Exception, e:
             #print sql, "\n\n"
-            print sql, "\n"
             raise e
             # Return 'False' if some error occurred
             return False

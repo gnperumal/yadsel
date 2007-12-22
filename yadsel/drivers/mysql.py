@@ -85,8 +85,26 @@ class MySQLInspector(SchemaInspector):
     def get_domains_list(self):
         return []
 
+class MySQLLogControl(object):
+    sql_createtable = """
+        CREATE TABLE %(t)s (
+            id INTEGER NOT NULL AUTO_INCREMENT,
+            version_number INTEGER NOT NULL,
+            log_date DATETIME NOT NULL,
+            msg TEXT
+        );
+    """
+
+    sql_registerlog = """
+        INSERT INTO %(t)s
+         (version_number, log_date, msg)
+        VALUES
+         ('%(v)s', '%(d)s', '%(m)s')
+    """
+
 class MySQLDriver(GenericDriver):
     class Inspector(MySQLInspector): pass
+    class LogControl(MySQLLogControl): pass
 
     def __init__(self, connection=None):
         super(MySQLDriver, self).__init__(connection)
