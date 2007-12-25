@@ -275,11 +275,29 @@ class PostgresHistoryControl(GenericHistoryControl):
         );
     """
 
+class PostgresLogControl(object):
+    sql_createtable = """
+        CREATE TABLE %(t)s (
+            id SERIAL NOT NULL,
+            version_number INTEGER NOT NULL,
+            log_date DATETIME NOT NULL,
+            msg TEXT
+        );
+    """
+
+    sql_registerlog = """
+        INSERT INTO %(t)s
+         (version_number, log_date, msg)
+        VALUES
+         ('%(v)s', '%(d)s', '%(m)s')
+    """
+
 class PostgresDriver(GenericDriver):
     class Inspector(PostgresInspector): pass
     class FieldParser(PostgresFieldParser): pass
     class ConstraintParser(PostgresConstraintParser): pass
     class HistoryControl(PostgresHistoryControl): pass
+    class LogControl(PostgresLogControl): pass
 
     def __init__(self, connection=None):
         super(PostgresDriver, self).__init__(connection)
