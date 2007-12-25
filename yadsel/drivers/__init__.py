@@ -11,3 +11,12 @@ from firebird import FirebirdDriver as Firebird
 from mssql import MSSQLDriver as MSSQL
 from pgsql import PostgresDriver as Postgres
 
+DRIVERS_PER_ENGINE = {
+        'postgresql_psycopg2': Postgres,
+        'postgresql': Postgres,
+        'mysql': MySQL,
+        'sqlite3': SQLite,
+        'oracle': None,
+        '': None,
+        }
+
