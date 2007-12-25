@@ -11,7 +11,7 @@ class YadselLogAdmin(ModelAdmin):
     search_fields = ['msg',]
     list_display = ['version_number', 'log_date']
 
-admin.site.register(YadselHistory, YadselHistoryAdmin)
-admin.site.register(YadselLog, YadselLogAdmin)
+#admin.site.register(YadselHistory, YadselHistoryAdmin)
+#admin.site.register(YadselLog, YadselLogAdmin)
 
 
