@@ -50,8 +50,13 @@ class Controller(object):
         # Loads classes
         self.load_classes_version_from_module('yadsel_versions')
 
-    def load_classes_version_from_module(self, mod_name):
-        module = __import__(mod_name)
+    def load_classes_version_from_module(self, module):
+        from types import StringType, ModuleType
+
+        if type(module) == StringType:
+            module = __import__(mod_name)
+        elif type(module) != ModuleType:
+            return False
 
         for m in module.__dict__.values():
             try:

@@ -1,4 +1,4 @@
-import sys
+import sys, types
 from yadsel import core, drivers
 
 try:
@@ -63,6 +63,18 @@ def do(versions_path, driver_type, dsn, user, passwd, action, current_version,
             connection.select_db(dsn.split('/')[1])
             
         driver = drivers.MySQL
+    elif driver_type == "postgres":
+        try:
+            import psycopg2
+        except:
+            print "A Python extension called 'psycopg2' was not found!"
+            sys.exit(1)
+
+        if dsn:
+            host, dbname = dsn.split('/')
+            connection = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" %( dbname, user, host, passwd ))
+            
+        driver = drivers.Postgres
     elif driver_type == "sqlite":
         try:
             from pysqlite2 import dbapi2 as sqlite
@@ -75,7 +87,7 @@ def do(versions_path, driver_type, dsn, user, passwd, action, current_version,
 
         driver = drivers.SQLite
     else:
-        print "Only drivers 'Firebird', 'MySQL' and 'SQLite' are supported!"
+        print "Only drivers 'Firebird', 'MySQL', 'SQLite' and 'Postgres' are supported!"
         sys.exit(1)
 
     # Instantiates version controller
@@ -89,7 +101,11 @@ def do(versions_path, driver_type, dsn, user, passwd, action, current_version,
     else:
         controller.current_version = current_version
 
-    controller.load_versions_from_path(versions_path)
+    # Loads versions classes
+    if type(versions_path) == types.StringType:
+        controller.load_versions_from_path(versions_path)
+    elif type(versions_path) == types.ModuleType:
+        controller.load_classes_version_from_module(versions_path)
 
     if action == core.ACTION_UP:
         print_if( mode != MODE_HIDDEN, "Upgrading..." )

@@ -1,30 +1,33 @@
 from django.core.management.base import BaseCommand
+from django.conf import settings
 from optparse import make_option
+from imp import find_module, load_module
 
 from yadsel.execution import AVAILABLE_ACTIONS, AVAILABLE_MODES, do
+from yadsel import core, drivers
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
-        make_option('--action', action='store', dest='verbosity', default='up',
+        make_option('--action', action='store', dest='action', default='up',
             type='choice', choices=AVAILABLE_ACTIONS,
             help='Action of evolution; up=upgrade, down=downgrade'),
-        make_option('--from', action='store', dest='interactive', default=0,
+        make_option('--from', action='store', dest='from', default=0,
             help=''),
-        make_option('--to', action='store', dest='interactive', default=0,
+        make_option('--to', action='store', dest='to', default=0,
             help=''),
-        make_option('--mode', action='store', dest='verbosity', default='steps',
+        make_option('--mode', action='store', dest='mode', default='steps',
             type='choice', choices=AVAILABLE_MODES,
             help='Mode of output; hidden=messages are hidden, steps=step by step, interactive=confirms actions, output=only prints to output'),
-        make_option('--test', action='store', dest='verbosity', default=False,
+        make_option('--test', action='store', dest='test', default=False,
             type='choice', choices=[True, False],
             help='Set test mode'),
-        make_option('--history', action='store', dest='verbosity', default=True,
+        make_option('--history', action='store', dest='history', default=True,
             type='choice', choices=[True, False],
             help='Write history of versions'),
-        make_option('--silent', action='store', dest='verbosity', default=False,
+        make_option('--silent', action='store', dest='silent', default=False,
             type='choice', choices=[True, False],
             help='Keeps exception messages'),
-        make_option('--log', action='store', dest='verbosity', default=True,
+        make_option('--log', action='store', dest='log', default=True,
             type='choice', choices=[True, False],
             help='Write a log of changes'),
     )
@@ -35,9 +38,17 @@ class Command(BaseCommand):
         from django.conf import settings
         from django.db import connection
 
-        # Gets driver, dsn, user and pass
-        driver = self.__get_driver()
-        dsn = self.__get_dsn()
+        # driver
+        driver_type = self.__get_driver()
+
+        # dsn
+        dsn = self.__get_dsn(driver_type)
+        
+        # user
+        user = getattr(settings, 'DATABASE_USER', None)
+
+        # pass
+        passwd = getattr(settings, 'DATABASE_PASSWORD', None)
 
         # action
         action = options.get('action', 'up')
@@ -52,22 +63,43 @@ class Command(BaseCommand):
         mode = options.get('mode', 'steps')
 
         # test - settings
-        test = options.get('test', settings.__dict__.get('YADSEL_TEST', False))
+        test = options.get('test', getattr(settings, 'YADSEL_TEST', False))
 
         # history - settings
-        history = options.get('history', settings.__dict__.get('YADSEL_HISTORY', True))
+        history = options.get('history', getattr(settings, 'YADSEL_HISTORY', True))
 
         # silent - settings
-        silent = options.get('silent', settings.__dict__.get('YADSEL_SILENT', False))
+        silent = options.get('silent', getattr(settings, 'YADSEL_SILENT', False))
 
         # log - settings
-        log = options.get('log', settings.__dict__.get('YADSEL_LOG', True))
+        log = options.get('log', getattr(settings, 'YADSEL_LOG', True))
+
+        # Get applications list
+        apps = [a for a in settings.INSTALLED_APPS if not test_labels or a.split('.')[-1] in test_labels]
 
         # Loop for applications
-        # - versions_path
-        # - Run
+        for app in apps:
+            # Get versions module as versions_path
+            module = self.find_versions_module(app)
 
-        print test_labels
+            if not module: continue
+            
+            # Run
+            do(versions_path=module,
+               driver_type=driver_type,
+               dsn=dsn,
+               action=action,
+               user=user,
+               passwd=passwd,
+               current_version=current_version,
+               new_version=new_version,
+               mode=mode,
+               test=test,
+               history=history,
+               silent=silent,
+               log=log,
+               )
+
         """
         from django.db.models import get_models
         output = []
@@ -88,9 +120,33 @@ class Command(BaseCommand):
         output.append('{% endif %}')
         return '\n'.join(output)"""
 
-    def __get_driver(self):
-        pass
+    def find_versions_module(self, app_name):
+        parts = app_name.split('.')
+        parts.append('yadsel_versions')
+        parts.reverse()
+        path = None
 
-    def __get_dsn(self):
-        pass
+        try:
+            while parts:
+                part = parts.pop()
+                f, path, descr = find_module(part, path and [path] or None)
+
+            module = load_module('yadsel_versions', f, path, descr)
+            return module
+        except ImportError, e:
+            return None
+
+    def __get_driver(self):
+        return drivers.DRIVERS_PER_ENGINE[getattr(settings, 'DATABASE_ENGINE', '')]
+
+    def __get_dsn(self, driver_type=None):
+        if driver_type == 'sqlite':
+            dsn = settings.DATABASE_NAME
+        else:
+            dsn = ''
+            if getattr(settings, 'DATABASE_ENGINE', ''): dsn += settings.DATABASE_HOST
+            if getattr(settings, 'DATABASE_PORT', ''): dsn += ':'+settings.DATABASE_PORT
+            if getattr(settings, 'DATABASE_NAME', ''): dsn += '/'+settings.DATABASE_NAME
+
+        return dsn
 

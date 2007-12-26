@@ -12,10 +12,10 @@ from mssql import MSSQLDriver as MSSQL
 from pgsql import PostgresDriver as Postgres
 
 DRIVERS_PER_ENGINE = {
-        'postgresql_psycopg2': Postgres,
-        'postgresql': Postgres,
-        'mysql': MySQL,
-        'sqlite3': SQLite,
+        'postgresql_psycopg2': 'postgres',
+        'postgresql': 'postgres',
+        'mysql': 'mysql',
+        'sqlite3': 'sqlite',
         'oracle': None,
         '': None,
         }
