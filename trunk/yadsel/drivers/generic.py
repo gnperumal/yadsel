@@ -90,7 +90,7 @@ class GenericActionParser(object):
         #ocls = self.action.object.__class__
 
         if acls == Add:
-            return "ADD " + self.FieldParser(self.action.object).for_alter()
+            return "ADD " + self.FieldParser(self.action.object).for_create() # To check
         elif acls == AlterColumn:
             return "ALTER COLUMN %s" % self.FieldParser(self.action.object).for_alter()
         elif acls == DropColumn:
@@ -345,7 +345,6 @@ class GenericLogControl(object):
             self.connection.commit()
         except Exception, e:
             # Return 'False' if some error did (like "table already exists")
-            raise e
             return False
         
         return True
@@ -369,7 +368,8 @@ class GenericLogControl(object):
         log_date = log_date or datetime.now()
 
         # Remove invalid tokens
-        msg = msg.replace('"', "__").replace("'", "__")
+        #msg = msg.replace('"', "__").replace("'", "__")
+        msg = msg.replace('"', r"\"").replace("'", r"\'")
 
         sql = self.sql_registerlog %{ 
                 't': self.table_name,

@@ -54,7 +54,7 @@ class Controller(object):
         from types import StringType, ModuleType
 
         if type(module) == StringType:
-            module = __import__(mod_name)
+            module = __import__(module)
         elif type(module) != ModuleType:
             return False
 
