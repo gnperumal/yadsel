@@ -23,7 +23,8 @@ class ForeignKey(Constraint):
 
     def __init__(self, fields, table_name, foreign_fields, name=None):
         from types import TupleType, ListType
-        self.table_name, self.name = table_name, name
+        self.table_name = table_name
+        self.name = name or 'FK_%TABLE_NAME%_'+table_name
 
         self.fields = type(fields) in (TupleType,ListType) and fields or (fields,)
         self.foreign_fields = type(foreign_fields) in (TupleType,ListType) and foreign_fields or (foreign_fields,)

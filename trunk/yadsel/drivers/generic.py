@@ -384,8 +384,6 @@ class GenericLogControl(object):
             cur.execute(sql)
             self.connection.commit()
         except Exception, e:
-            #print sql, "\n\n"
-            raise e
             # Return 'False' if some error occurred
             return False
 
@@ -445,6 +443,8 @@ class GenericDriver(Driver):
         super(GenericDriver, self).__init__(connection)
 
     def generate_script(self, command):
+        super(GenericDriver, self).generate_script(command)
+
         class_name = command.__class__.__name__
 
         if class_name in self.auto_connect_commands:

@@ -92,6 +92,7 @@ class Controller(object):
 
         for cls in versions:
             obj = cls()
+            self.driver.additional_scripts = []
 
             if do == ACTION_UP:
                 obj.do_up()
