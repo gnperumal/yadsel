@@ -193,8 +193,18 @@ class FirebirdFieldParser(object):
             if field.required:
                 ret += " NOT NULL "
 
-            #if field.references and field.references.__class__ == ForeignKey:
-            #    ret += " REFERENCES '%s' ('%s') " %( field.references.table_name, field.references.field_name )
+            if field.references and field.references.__class__ == ForeignKey:
+                sql = 'ALTER TABLE %%TABLE_NAME%% \
+                        ADD CONSTRAINT %s \
+                        FOREIGN KEY (%s) \
+                        REFERENCES %s (%s);' %(
+                                field.references.name,
+                                ','.join(field.references.fields),
+                                field.references.table_name,
+                                ','.join(field.references.foreign_fields),
+                                )
+                self.additional_scripts += [sql]
+            #    ret += " REFERENCES %s %s " %( field.references.table_name, field.references.foreign_fields )
 
             if field.primary_key:
                 sql = 'ALTER TABLE %%TABLE_NAME%% \
