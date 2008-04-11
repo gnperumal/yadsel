@@ -178,7 +178,8 @@ class GenericHistoryControl(object):
         CREATE TABLE %(t)s (
             version_number INTEGER NOT NULL,
             change_date DATETIME NOT NULL,
-            errors INTEGER DEFAULT 0
+            errors INTEGER DEFAULT 0,
+            version_space VARCHAR(50) NULL
         );
     """
 
@@ -194,9 +195,9 @@ class GenericHistoryControl(object):
 
     sql_registerversion = """
         INSERT INTO %s
-         (version_number, change_date, errors)
+         (version_space, version_number, change_date, errors)
         VALUES
-        ('%s', '%s', %d)
+        ('%s', '%s', '%s', %d)
     """
 
     # 'O': Finished OK, 'E': Finished with Errors
@@ -239,11 +240,13 @@ class GenericHistoryControl(object):
 
         return True
 
-    def register_version(self, version_number, change_date=None, errors=0):
+    def register_version(self, version_number, change_date=None, errors=0, version_space=None):
         # Determines date/time of version change by default (now)
         change_date = change_date or datetime.now()
 
-        sql = self.sql_registerversion %( self.table_name, version_number, change_date.isoformat(' ')[:19], errors )
+        version_space = version_space or 'main' # default version space
+
+        sql = self.sql_registerversion %( self.table_name, version_space, version_number, change_date.isoformat(' ')[:19], errors )
 
         cur = self.connection.cursor()
 
@@ -306,7 +309,8 @@ class GenericLogControl(object):
             id INTEGER NOT NULL,
             version_number INTEGER NOT NULL,
             log_date DATETIME NOT NULL,
-            msg TEXT
+            msg TEXT,
+            version_space VARCHAR(50) NULL
         );
     """
 
@@ -322,10 +326,10 @@ class GenericLogControl(object):
 
     sql_registerlog = """
         INSERT INTO %(t)s
-         (id, version_number, log_date, msg)
+         (id, version_space, version_number, log_date, msg)
         VALUES
          ((select case when max(id) is null then 0 else max(id) end + 1 
-           from %(t)s), '%(v)s', '%(d)s', '%(m)s')
+           from %(t)s), '%(s)s', '%(v)s', '%(d)s', '%(m)s')
     """
 
     def __init__(self, connection):
@@ -363,9 +367,11 @@ class GenericLogControl(object):
 
         return True
 
-    def register_log(self, version_number, msg, log_date=None):
+    def register_log(self, version_number, msg, log_date=None, version_space=None):
         # Determines date/time of version change by default (now)
         log_date = log_date or datetime.now()
+
+        version_space = version_space or 'main' # default version space
 
         # Remove invalid tokens
         #msg = msg.replace('"', "__").replace("'", "__")
@@ -373,6 +379,7 @@ class GenericLogControl(object):
 
         sql = self.sql_registerlog %{ 
                 't': self.table_name,
+                's': version_space,
                 'v': version_number,
                 'd': log_date.isoformat(' ')[:19],
                 'm': msg,

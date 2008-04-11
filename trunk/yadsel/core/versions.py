@@ -17,6 +17,7 @@ class Controller(object):
     connection = None
     driver = None
     current_version = 0
+    current_version_space = None
     version_classes = []
     cache = {}
     log = silent = False
@@ -128,12 +129,12 @@ class Controller(object):
 
         return pk_list + fk_list + others
 
-    def __execute_command(self, command, version_number=None):
+    def __execute_command(self, command, version_number=None, version_space=None):
         version_number = version_number or self.current_version
 
         try:
             # Log before execution
-            self.register_log(command, version_number=version_number)
+            self.register_log(command, version_number=version_number, version_space=version_space)
 
             self.driver.execute_command(command)
         except Exception, e:
@@ -142,7 +143,7 @@ class Controller(object):
             msg = "When executing the following SQL command: '%s', following error ocurred: '%s'" %( command, e )
 
             # Log exception message
-            self.register_log(str(e), version_number=version_number)
+            self.register_log(str(e), version_number=version_number, version_space=version_space)
 
             if self.silent:
                 print msg
@@ -155,23 +156,26 @@ class Controller(object):
             self.__version_errors = 0
 
             # Log version started
-            self.register_log('Version process started...', version_number=v)
+            self.register_log('Version process started...', version_number=v, version_space=self.current_version_space)
 
             # Loop by commands
             for cmd in script[v]:
                 # Execute the single command each by time
-                self.__execute_command(cmd, version_number=v)
+                self.__execute_command(cmd, version_number=v, version_space=self.current_version_space)
 
             # Log version finished
-            self.register_log('Version process finished...', version_number=v)
+            self.register_log('Version process finished...', version_number=v, version_space=self.current_version_space)
 
             # Register version
             self.current_version = v
-            self.register_version_history(self.current_version, errors=self.__version_errors)
+            self.register_version_history(self.current_version, errors=self.__version_errors, \
+                    version_space=self.current_version_space)
 
-    def upgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False, silent=False, log=False):
+    def upgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False, silent=False, \
+            log=False, version_space=None):
         self.silent = silent
         self.log = log
+        self.current_version_space = version_space
 
         if not cacheable or force:
             # Get the generated script
@@ -199,7 +203,11 @@ class Controller(object):
         if not test:
             self.__execute_script(self.cache['script'], versions_list)
 
-    def downgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False, silent=False):
+    def downgrade(self, current=None, to=None, cacheable=False, force=False, step=None, test=False, silent=False, log=False, version_space=None):
+        self.silent = silent
+        self.log = log
+        self.current_version_space = version_space
+
         if not cacheable or force:
             # Get the generated script
             self.cache['script'] = self.script_for_downgrade()
@@ -234,7 +242,7 @@ class Controller(object):
         # Set current version by latest version number
         self.current_version = latest_version and latest_version['version_number'] or 0
 
-    def register_version_history(self, version_number, errors=0):
+    def register_version_history(self, version_number, errors=0, version_space=None):
         if not self.connection: return False
 
         # Instantiates history control
@@ -244,9 +252,9 @@ class Controller(object):
         history.prepare_database_elements()
 
         # Register new version to history control
-        return history.register_version(version_number, errors=errors)
+        return history.register_version(version_number, errors=errors, version_space=version_space)
 
-    def register_log(self, msg, version_number=None):
+    def register_log(self, msg, version_number=None, version_space=None):
         if not self.connection or not self.log: return False
 
         version_number = version_number or self.current_version
@@ -258,7 +266,7 @@ class Controller(object):
         log.prepare_database_elements()
 
         # Register new version to log control
-        return log.register_log(version_number, msg)
+        return log.register_log(version_number, msg, version_space=version_space)
 
 
 class ExtensibleVersion(object):
@@ -324,6 +332,7 @@ class Version(ExtensibleVersion):
     @modified 2007-07-28 (renamed from Version to ExtensibleVersion, and extended from it)
     """
     version_number = None
+    version_space = None
 
 class PartialVersion(ExtensibleVersion):
     """

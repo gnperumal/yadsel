@@ -18,7 +18,7 @@ def print_if( condition, s ):
     if condition: print s
 
 def do(versions_path, driver_type, dsn, user, passwd, action, current_version, 
-        new_version, mode, test, history, silent, log):
+        new_version, mode, test, history, silent, log, version_space=None):
     """Executes the upgrade or downgrade"""
     versions_path = versions_path or '.'
     action = action or 'up'
@@ -120,19 +120,23 @@ def do(versions_path, driver_type, dsn, user, passwd, action, current_version,
                 for cmd in script[v]:
                     print "", cmd
         elif mode == MODE_HIDDEN:
-            controller.upgrade(current=current_version, to=new_version, test=test, silent=silent, log=log)
+            controller.upgrade(current=current_version, to=new_version, test=test, silent=silent, \
+                    log=log, version_space=version_space)
         elif mode == MODE_STEPS:
             # First step for build scripts for cache and gets steps count
-            controller.upgrade(current=current_version, to=new_version, cacheable=True, force=True, step=0, test=test, silent=silent, log=log)
+            controller.upgrade(current=current_version, to=new_version, cacheable=True, force=True, \
+                    step=0, test=test, silent=silent, log=log, version_space=version_space)
             print 'Step %d of %d: ""' %( 1, controller.cache['steps_count'] )
 
             # Loop for next steps (if exists)
             if controller.cache['steps_count'] > 1:
                 for i in range(1, controller.cache['steps_count']):
-                    controller.upgrade(cacheable=True, step=i, test=test, silent=silent, log=log)
+                    controller.upgrade(cacheable=True, step=i, test=test, silent=silent, log=log, \
+                            version_space=version_space)
                     print 'Step %d of %d: "%s"' %( i+1, controller.cache['steps_count'], "" )
         else:
-            controller.upgrade(current=current_version, to=new_version, test=test, silent=silent, log=log)
+            controller.upgrade(current=current_version, to=new_version, test=test, silent=silent, \
+                    log=log, version_space=version_space)
             
     elif action == core.ACTION_DOWN:
         print_if( mode != MODE_HIDDEN, "Downgrading..." )
@@ -147,19 +151,19 @@ def do(versions_path, driver_type, dsn, user, passwd, action, current_version,
                 for cmd in script[v]:
                     print "", cmd
         elif mode == MODE_HIDDEN:
-            controller.downgrade(test=test)
+            controller.downgrade(test=test, version_space=version_space)
         elif mode == MODE_STEPS:
             # First step for build scripts for cache and gets steps count
-            controller.downgrade(cacheable=True, force=True, step=0, test=test)
+            controller.downgrade(cacheable=True, force=True, step=0, test=test, version_space=version_space)
             print 'Step %d of %d: ""' %( 1, controller.cache['steps_count'] )
 
             # Loop for next steps (if exists)
             if controller.cache['steps_count'] > 1:
                 for i in range(1, controller.cache['steps_count']):
-                    controller.downgrade(cacheable=True, step=i, test=test)
+                    controller.downgrade(cacheable=True, step=i, test=test, version_space=version_space)
                     print 'Step %d of %d: "%s"' %( i+1, controller.cache['steps_count'], "" )
         else:
-            controller.downgrade(test=test)
+            controller.downgrade(test=test, version_space=version_space)
 
 def do_from_dict(keys):
     # Does the (up|down)grade
