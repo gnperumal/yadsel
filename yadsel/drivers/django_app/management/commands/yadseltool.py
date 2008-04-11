@@ -1,5 +1,6 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from optparse import make_option
 from imp import find_module, load_module
 
@@ -34,7 +35,32 @@ class Command(BaseCommand):
     help = 'Executes Yadsel database version control for the given app name(s).'
     args = '[appname ...]'
 
-    def handle(self, *test_labels, **options):
+    def handle(self, *app_labels, **options):
+        from django.db import models
+        if not app_labels:
+            raise CommandError('Enter at least one appname.')
+
+        try:
+            # Get applications list
+            app_list = [app for app in settings.INSTALLED_APPS if app.split('.')[-1] in app_labels]
+
+            #app_list = [models.get_app(app_label) for app_label in app_labels]
+        except (ImproperlyConfigured, ImportError), e:
+            raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e)
+
+        output = []
+        for app in app_list:
+            # Get versions module as versions_path
+            module = self.find_versions_module(app)
+
+            app_output = self.handle_app(app.split('.')[-1], module, **options)
+
+            if app_output:
+                output.append(app_output)
+
+        return '\n'.join(output)
+
+    def handle_app(self, app_label, app, **options):
         from django.conf import settings
         from django.db import connection
 
@@ -74,18 +100,8 @@ class Command(BaseCommand):
         # log - settings
         log = options.get('log', getattr(settings, 'YADSEL_LOG', True))
 
-        # Get applications list
-        apps = [a for a in settings.INSTALLED_APPS if not test_labels or a.split('.')[-1] in test_labels]
-
-        # Loop for applications
-        for app in apps:
-            # Get versions module as versions_path
-            module = self.find_versions_module(app)
-
-            if not module: continue
-            
-            # Run
-            do(versions_path=module,
+        # Run
+        do(versions_path=app,
                driver_type=driver_type,
                dsn=dsn,
                action=action,
@@ -98,27 +114,8 @@ class Command(BaseCommand):
                history=history,
                silent=silent,
                log=log,
+               version_space=app_label,
                )
-
-        """
-        from django.db.models import get_models
-        output = []
-        app_models = get_models(app)
-        app_label = app_models[0]._meta.app_label
-        output.append('{%% if perms.%s %%}' % app_label)
-        output.append('<div class="module"><h2>%s</h2><table>' % app_label.title())
-        for model in app_models:
-            if model._meta.admin:
-                output.append(MODULE_TEMPLATE % {
-                    'app': app_label,
-                    'mod': model._meta.module_name,
-                    'name': force_unicode(capfirst(model._meta.verbose_name_plural)),
-                    'addperm': model._meta.get_add_permission(),
-                    'changeperm': model._meta.get_change_permission(),
-                })
-        output.append('</table></div>')
-        output.append('{% endif %}')
-        return '\n'.join(output)"""
 
     def find_versions_module(self, app_name):
         parts = app_name.split('.')
